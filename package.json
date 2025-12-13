@@ -3,13 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 4040",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.87.1",
+    "drizzle-orm": "^0.45.1",
+    "lucide-react": "^0.561.0",
     "next": "16.0.10",
+    "postgres": "^3.4.7",
     "react": "19.2.1",
     "react-dom": "19.2.1"
   },
@@ -18,6 +22,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.8",
     "eslint": "^9",
     "eslint-config-next": "16.0.10",
     "tailwindcss": "^4",
