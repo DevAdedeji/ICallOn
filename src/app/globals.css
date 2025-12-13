@@ -106,3 +106,7 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #46ec13;
 }
+
+.neon-text-shadow {
+  text-shadow: 0 0 20px rgba(70, 236, 19, 0.3);
+}

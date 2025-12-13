@@ -1,3 +1,5 @@
+"use client"
+
 import { Gamepad2 } from "lucide-react";
 export default function Footer() {
     return (
