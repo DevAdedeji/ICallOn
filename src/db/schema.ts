@@ -7,3 +7,54 @@ export const users = pgTable("users", {
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull()
 })
+
+export const rooms = pgTable("rooms", {
+    id: text("id").primaryKey(),
+    code: text("code").notNull().unique(),
+    hostId: text("host_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    status: text("status").notNull().default("lobby"),
+    maxRounds: integer("max_rounds").notNull().default(5),
+    timePerRound: integer("time_per_round").notNull().default(60),
+    currentRound: integer("current_round").notNull().default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    startedAt: timestamp("started_at"),
+    endedAt: timestamp("ended_at")
+})
+
+export const players = pgTable("players", {
+    id: text("id").primaryKey(),
+    roomId: text("room_id").notNull().references(() => rooms.id, { onDelete: "cascade" }),
+    userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
+    displayName: text("display_name").notNull(),
+    isHost: boolean("is_host").notNull().default(false),
+    totalScore: integer("total_score").notNull().default(0),
+    isConnected: boolean("is_connected").notNull().default(true),
+    joinedAt: timestamp("joined_at").defaultNow().notNull()
+})
+
+export const rounds = pgTable("rounds", {
+    id: text("id").primaryKey(),
+    roomId: text("room_id").notNull().references(() => rooms.id, { onDelete: "cascade" }),
+    roundNumber: integer("round_number").notNull(),
+    letter: text("letter").notNull(),
+    status: text("status").notNull().default("active"),
+    startedAt: timestamp("started_at").defaultNow().notNull(),
+    endedAt: timestamp("ended_at")
+})
+
+export const answers = pgTable("answers", {
+    id: text("id").primaryKey(),
+    roundId: text("round_id").notNull().references(() => rounds.id, { onDelete: "cascade" }),
+    playerId: text("player_id").notNull().references(() => players.id, { onDelete: "cascade" }),
+    animal: text("animal"),
+    name: text("name"),
+    place: text("place"),
+    thing: text("thing"),
+    animalValid: boolean("animal_valid").default(false),
+    nameValid: boolean("name_valid").default(false),
+    placeValid: boolean("place_valid").default(false),
+    thingValid: boolean("thing_valid").default(false),
+    pointsEarned: integer("points_earned").notNull().default(0),
+    submittedAt: timestamp("submitted_at").defaultNow().notNull(),
+    validatedAt: timestamp("validated_at")
+})
