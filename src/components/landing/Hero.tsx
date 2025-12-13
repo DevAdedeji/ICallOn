@@ -1,4 +1,6 @@
-import { CirclePlus, UserPlus } from "lucide-react"
+import { CirclePlus, UserPlus } from "lucide-react";
+import Button from "../ui/Button";
+
 export default function Hero() {
     return (
         <main className="grow flex flex-col items-center justify-center relative z-10 px-4 pt-20 pb-16 sm:pt-32">
@@ -15,14 +17,14 @@ export default function Hero() {
                     No downloads required. Just share a link, jump into a lobby, and start guessing instantly. The fastest word game on the web.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-4">
-                    <button className="flex items-center justify-center gap-2 rounded-full bg-primary hover:bg-primary-dark text-background-dark text-base sm:text-lg font-bold h-14 px-8 min-w-50 transition-all transform hover:scale-105 shadow-[0_0_30px_rgba(70,236,19,0.4)]">
+                    <Button variant="primary">
                         <CirclePlus />
                         Create Game
-                    </button>
-                    <button className="glass-panel flex items-center justify-center gap-2 rounded-full text-white hover:bg-white/10 text-base sm:text-lg font-bold h-14 px-8 min-w-50 transition-all transform hover:scale-105">
+                    </Button>
+                    <Button variant="outline">
                         <UserPlus />
                         Join Game
-                    </button>
+                    </Button>
                 </div>
             </div>
             <div className="mt-20 w-full max-w-6xl px-4 perspective-[2000px]">
