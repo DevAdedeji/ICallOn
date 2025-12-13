@@ -22,7 +22,12 @@ export default function SignUpForm() {
         setLoading(true)
         const { error } = await supabase.auth.signUp({
             email: data.email,
-            password: data.password
+            password: data.password,
+            options: {
+                data: {
+                    username: data.username
+                }
+            }
         })
         if (error) {
             alert(error.message)
@@ -48,6 +53,7 @@ export default function SignUpForm() {
         <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
             <div className="pt-2 flex flex-col gap-4">
                 <Input type="email" placeholder="Email Address" {...register("email")} error={errors.email?.message} />
+                <Input type="text" placeholder="Username" {...register("username")} error={errors.username?.message} />
                 <Input type="password" placeholder="*******" {...register("password")} error={errors.password?.message} />
                 <Button variant="primary" type="submit" loading={loading} disabled={loading}>
                     Create Account
