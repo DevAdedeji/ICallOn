@@ -6,7 +6,7 @@ export default function CTA() {
             <div className="max-w-3xl mx-auto">
                 <h2 className="text-4xl sm:text-5xl font-black text-white mb-8">Ready to challenge your friends?</h2>
                 <div className="flex justify-center">
-                    <Button variant="secondary">
+                    <Button variant="secondary" href="/create">
                         Start Playing Now
                     </Button>
                 </div>

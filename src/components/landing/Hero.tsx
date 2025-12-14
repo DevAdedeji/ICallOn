@@ -17,11 +17,11 @@ export default function Hero() {
                     No downloads required. Just share a link, jump into a lobby, and start guessing instantly. The fastest word game on the web.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-4">
-                    <Button variant="primary">
+                    <Button variant="primary" href="/create">
                         <CirclePlus />
                         Create Game
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" href="/join">
                         <UserPlus />
                         Join Game
                     </Button>
