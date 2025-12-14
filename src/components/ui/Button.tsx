@@ -29,7 +29,7 @@ const getVariantStyles = (variant: ButtonProps['variant']) => {
 }
 
 const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(({ className, loading, children, variant = "primary", ...props }, ref) => {
-    const baseStyles = "flex items-center justify-center gap-2 px-8 whitespace-nowrap";
+    const baseStyles = "flex items-center justify-center gap-2 px-8 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed";
     const variantStyles = getVariantStyles(variant);
     const combinedStyles = `${baseStyles} ${variantStyles} ${className || ''}`;
     if ("href" in props && props.href) {

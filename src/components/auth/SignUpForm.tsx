@@ -9,6 +9,7 @@ import { SignUpFormInputs, signUpSchema } from "@/src/schemas/auth";
 import { supabase } from "@/src/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function SignUpForm() {
     const { handleSubmit, register, formState: { errors } } = useForm<SignUpFormInputs>({
@@ -30,7 +31,7 @@ export default function SignUpForm() {
             }
         })
         if (error) {
-            alert(error.message)
+            toast.error(error.message)
         } else {
             router.push("/auth/login")
         }

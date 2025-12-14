@@ -9,6 +9,7 @@ import { LoginFormInputs, loginSchema } from "@/src/schemas/auth";
 import { supabase } from "@/src/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from 'sonner';
 
 export default function LoginForm() {
     const { handleSubmit, register, formState: { errors } } = useForm<LoginFormInputs>({
@@ -24,7 +25,7 @@ export default function LoginForm() {
             password: data.password
         })
         if (error) {
-            alert(error.message)
+            toast.error(error.message)
         } else {
             router.push("/create")
         }
