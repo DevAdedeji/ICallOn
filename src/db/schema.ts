@@ -1,4 +1,5 @@
 import { pgTable, text, timestamp, integer, boolean } from "drizzle-orm/pg-core";
+import { InferSelectModel } from "drizzle-orm";
 
 export const users = pgTable("users", {
     id: text("id").primaryKey(),
@@ -58,3 +59,18 @@ export const answers = pgTable("answers", {
     submittedAt: timestamp("submitted_at").defaultNow().notNull(),
     validatedAt: timestamp("validated_at")
 })
+
+// Users
+export type User = InferSelectModel<typeof users>
+
+// Rooms
+export type Room = InferSelectModel<typeof rooms>
+
+// Players
+export type Player = InferSelectModel<typeof players>
+
+// Rounds
+export type Round = InferSelectModel<typeof rounds>
+
+// Answers
+export type Answer = InferSelectModel<typeof answers>

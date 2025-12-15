@@ -77,3 +77,22 @@ export async function createRoom(maxRounds: number, timePerRound: number) {
         return { error: "Failed to create room", success: false }
     }
 }
+
+export async function fetchRoomById(id: string) {
+    try {
+        const room = await db.query.rooms.findFirst({
+            where: (rooms, { eq }) => eq(rooms.id, id)
+        })
+        if (room) {
+            return {
+                success: true,
+                room
+            }
+        } else {
+            return { error: "Failed to fetch room", success: false }
+        }
+    } catch (error) {
+        console.error("Room fetching error:", error)
+        return { error: "Failed to fetch room", success: false }
+    }
+}

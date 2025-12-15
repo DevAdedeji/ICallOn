@@ -87,7 +87,7 @@ export default function CreateGamePage() {
 
     return (
         <main className="relative z-10 flex flex-1 flex-col items-center justify-center p-4 w-full">
-            <main className="w-full max-w-225 glass-panel rounded-3xl relative overflow-hidden flex flex-col md:flex-row shadow-2xl ring-1 ring-white/10">
+            <section className="w-full max-w-225 glass-panel rounded-3xl relative overflow-hidden flex flex-col md:flex-row shadow-2xl ring-1 ring-white/10">
                 <div className="hidden md:flex md:w-[35%] bg-surface-dark relative flex-col justify-between p-8 border-r border-white/5 overflow-hidden group/sidebar">
                     <div className="absolute inset-0 z-0">
                         <img alt="" className="w-full h-full object-cover opacity-40 group-hover/sidebar:scale-110 transition-transform duration-[20s] ease-linear" data-alt="Abstract 3D neon green geometric shapes floating in dark space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcsP28QW4T1RK2FW5UtjJvLFLaJEcu72WCu18UJYyl_qKgI0Mc6LejJ3Sxo9QNs7BDEY3nnTmQIWkhXc6qd7r5vb94T7OdhvrJP8I0vqbiqjXH5AWHIaI_UT1_BE7GKoIfPzeVcpcmu-8nD9FVLdjAEkXMP-RJLPxfeM08xRq6sR_TnhCjgdGTrIz9lrO2nMtR5FBYTHFVSPYHCRu0Uki_1pRGzG9Uqhb1c4tQL5k6ERQMGuqWYT8LpJmPG1eET6lziozTcIvgcT-p" />
@@ -196,7 +196,7 @@ export default function CreateGamePage() {
                         </div>
                     </form>
                 </div>
-            </main>
+            </section>
         </main>
     )
 }

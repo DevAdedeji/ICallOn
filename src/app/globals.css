@@ -110,3 +110,26 @@ body {
 .neon-text-shadow {
   text-shadow: 0 0 20px rgba(70, 236, 19, 0.3);
 }
+
+.neon-glow {
+  box-shadow: 0 0 20px rgba(70, 236, 19, 0.15);
+}
+
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(1.05);
+  }
+}
+
+.pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

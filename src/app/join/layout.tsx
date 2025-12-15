@@ -1,6 +1,4 @@
-import Header from "@/src/components/landing/Header"
-
-export default function AuthLayout({
+export default function JoinGameLayout({
     children,
 }: Readonly<{ children: React.ReactNode }>) {
     return (

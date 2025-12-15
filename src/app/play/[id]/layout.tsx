@@ -1,4 +1,4 @@
-export default function CreateGameLayout({
+export default function PlayGameLayout({
     children,
 }: Readonly<{ children: React.ReactNode }>) {
     return (
