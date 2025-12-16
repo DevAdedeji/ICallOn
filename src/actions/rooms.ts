@@ -1,6 +1,6 @@
 'use server'
 
-import { createSupabaseServerClient } from "@/src/lib/supabase/server";
+import { getSupabaseServerClient } from "@/src/lib/supabase/server";
 import { db } from "@/src/db";
 import { rooms } from "@/src/db/schema";
 import { nanoid } from "nanoid";
@@ -17,7 +17,7 @@ function generateRoomCode(): string {
 
 export async function createRoom(maxRounds: number, timePerRound: number) {
     try {
-        const supabase = await createSupabaseServerClient()
+        const supabase = await getSupabaseServerClient()
         const { data: { user }, error: authError } = await supabase.auth.getUser()
 
         if (authError || !user) {

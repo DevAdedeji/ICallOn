@@ -24,9 +24,9 @@ export const rooms = pgTable("rooms", {
 
 export const players = pgTable("players", {
     id: text("id").primaryKey(),
-    roomId: text("room_id").notNull().references(() => rooms.id, { onDelete: "cascade" }),
-    userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
-    displayName: text("display_name").notNull(),
+    room_id: text("room_id").notNull().references(() => rooms.id, { onDelete: "cascade" }),
+    user_id: text("user_id").references(() => users.id, { onDelete: "set null" }),
+    display_name: text("display_name").notNull(),
     isHost: boolean("is_host").notNull().default(false),
     totalScore: integer("total_score").notNull().default(0),
     isConnected: boolean("is_connected").notNull().default(true),
