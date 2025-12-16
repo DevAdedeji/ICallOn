@@ -35,8 +35,8 @@ export const players = pgTable("players", {
 
 export const rounds = pgTable("rounds", {
     id: text("id").primaryKey(),
-    roomId: text("room_id").notNull().references(() => rooms.id, { onDelete: "cascade" }),
-    roundNumber: integer("round_number").notNull(),
+    room_id: text("room_id").notNull().references(() => rooms.id, { onDelete: "cascade" }),
+    round_number: integer("round_number").notNull(),
     letter: text("letter").notNull(),
     status: text("status").notNull().default("active"),
     startedAt: timestamp("started_at").defaultNow().notNull(),

@@ -35,8 +35,6 @@ export default function JoinForm({ roomId }: { roomId: string }) {
                     toast.error(result.error || "Failed to join game")
                     return
                 }
-
-                // Success - refresh and navigate
                 toast.success("Joined successfully!")
                 router.refresh()
             } catch (err) {

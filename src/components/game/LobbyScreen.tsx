@@ -2,10 +2,10 @@
 
 import { Room, User } from "@/src/db/schema";
 import type { User as LoggedInUser } from "@supabase/supabase-js";
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react"
 import { Copy, Timer, RotateCw, Settings, Users, Play, User as UserIcon } from "lucide-react";
 import { copyToClipboard } from "@/src/lib/utils";
-import { toast } from 'sonner';
+import { toast } from "sonner";
 import Button from "../ui/Button";
 import { supabase } from "@/src/lib/supabase/client";
 import { Player } from "@/src/db/schema";
@@ -35,13 +35,13 @@ export default function LobbyScreen({ host, room, user, playerId }: { host?: Use
 
         const fetchPlayers = async () => {
             const { data, error } = await supabase
-                .from('players')
-                .select('*')
-                .eq('room_id', roomId)
+                .from("players")
+                .select("*")
+                .eq("room_id", roomId)
 
             if (error) {
-                console.error('Failed to fetch players:', error)
-                toast.error('Failed to load players')
+                console.error("Failed to fetch players:", error)
+                toast.error("Failed to load players")
             } else if (isMounted) {
                 setPlayers(data ?? [])
             }
@@ -53,11 +53,11 @@ export default function LobbyScreen({ host, room, user, playerId }: { host?: Use
         const channel = supabase
             .channel(`room-${roomId}-lobby`)
             .on(
-                'postgres_changes',
+                "postgres_changes",
                 {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'players',
+                    event: "INSERT",
+                    schema: "public",
+                    table: "players",
                     filter: `room_id=eq.${roomId}`
                 },
                 (payload) => {
@@ -65,10 +65,10 @@ export default function LobbyScreen({ host, room, user, playerId }: { host?: Use
                     if (isMounted) {
                         setPlayers(prev => {
                             if (prev.some(p => p.id === payload.new.id)) {
-                                console.log('⚠️ Duplicate player prevented:', payload.new.id)
+                                console.log("⚠️ Duplicate player prevented:", payload.new.id)
                                 return prev
                             }
-                            console.log('➕ Adding new player:', payload.new)
+                            console.log("➕ Adding new player:", payload.new)
                             return [...prev, payload.new as Player]
                         })
                         toast.success(`${(payload.new as Player).display_name} joined!`)
@@ -76,11 +76,11 @@ export default function LobbyScreen({ host, room, user, playerId }: { host?: Use
                 }
             )
             .on(
-                'postgres_changes',
+                "postgres_changes",
                 {
-                    event: 'UPDATE',
-                    schema: 'public',
-                    table: 'players',
+                    event: "UPDATE",
+                    schema: "public",
+                    table: "players",
                     filter: `room_id=eq.${roomId}`
                 },
                 (payload) => {
@@ -92,11 +92,11 @@ export default function LobbyScreen({ host, room, user, playerId }: { host?: Use
                 }
             )
             .on(
-                'postgres_changes',
+                "postgres_changes",
                 {
-                    event: 'DELETE',
-                    schema: 'public',
-                    table: 'players',
+                    event: "DELETE",
+                    schema: "public",
+                    table: "players",
                     filter: `room_id=eq.${roomId}`
                 },
                 (payload) => {
@@ -107,11 +107,11 @@ export default function LobbyScreen({ host, room, user, playerId }: { host?: Use
                 }
             )
             .subscribe((status) => {
-                if (status === 'SUBSCRIBED') {
-                    console.log('Subscribed to lobby updates')
-                } else if (status === 'CHANNEL_ERROR') {
-                    console.error('Subscription error')
-                    toast.error('Real-time connection failed')
+                if (status === "SUBSCRIBED") {
+                    console.log("Subscribed to lobby updates")
+                } else if (status === "CHANNEL_ERROR") {
+                    console.error("Subscription error")
+                    toast.error("Real-time connection failed")
                 }
             })
 
@@ -129,9 +129,9 @@ export default function LobbyScreen({ host, room, user, playerId }: { host?: Use
     useEffect(() => {
         const channel = supabase.channel(`room-${roomId}-status`)
             .on("postgres_changes", {
-                event: 'UPDATE',
-                schema: 'public',
-                table: 'rooms',
+                event: "UPDATE",
+                schema: "public",
+                table: "rooms",
                 filter: `id=eq.${roomId}`
             }, (payload) => {
                 const newStatus = payload.new.status

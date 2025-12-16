@@ -43,7 +43,7 @@ export default function CreateGamePage() {
             if (result.room) {
                 setRoomCode(result.room.code)
                 setRoomId(result.room.id)
-                setShareLink(`${window.location.origin}/play/${result.room.code}`)
+                setShareLink(`${window.location.origin}/play/${result.room.id}`)
             }
 
         } catch (error) {
