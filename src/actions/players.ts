@@ -7,42 +7,6 @@ import { nanoid } from "nanoid";
 import { cookies } from "next/headers";
 import { and, eq } from "drizzle-orm"
 
-export async function createPlayer({
-    roomId,
-    userId,
-    displayName,
-    isHost
-}: {
-    roomId: string
-    userId: string | null
-    displayName: string
-    isHost: boolean
-}) {
-    try {
-        const cookieStore = await cookies()
-        const playerId = nanoid()
-
-        const [player] = await db.insert(players).values({
-            id: playerId,
-            room_id: roomId,
-            user_id: userId,
-            display_name: displayName,
-            isHost
-        }).returning()
-
-        cookieStore.set("playerId", playerId, {
-            httpOnly: true,
-            sameSite: "lax",
-            path: "/",
-        })
-
-        return { success: true, player }
-    } catch (error) {
-        console.error("Error creating player:", error)
-        return { success: false, error: "Failed to join room" }
-    }
-}
-
 export async function fetchPlayerById(playerId: string) {
     try {
         const player = await db.query.players.findFirst({
@@ -93,7 +57,7 @@ export async function createOrGetPlayer(input: JoinInput) {
         const [player] = await db
             .insert(players)
             .values({
-                id: nanoid(),
+                id: input.userId ?? nanoid(),
                 room_id: input.roomId,
                 user_id: input.userId ?? null,
                 display_name: input.displayName,

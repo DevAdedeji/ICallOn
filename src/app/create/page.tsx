@@ -57,7 +57,7 @@ export default function CreateGamePage() {
 
     const handleActionButton = () => {
         if (roomCode && roomId) {
-            router.push(`/room/${roomId}`)
+            router.push(`/play/${roomId}`)
         } else {
             handleCreateRoom()
         }
@@ -183,7 +183,7 @@ export default function CreateGamePage() {
                             <button type="submit"
                                 disabled={!selectedRounds || !selectedTimer || isCreating} className="w-full h-16 bg-primary hover:bg-[#3bd10f] active:scale-[0.98] text-background-dark font-black text-xl uppercase tracking-wider rounded-2xl shadow-[0_0_20px_rgba(70,236,19,0.3)] hover:shadow-[0_0_40px_rgba(70,236,19,0.5)] transition-all flex items-center justify-center gap-3 group relative overflow-hidden disabled:opacity-50">
                                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 skew-y-12"></div>
-                                <span className="relative z-10">
+                                <span className="relative z-10 flex items-center gap-2">
                                     {isCreating ? (
                                         <>
                                             <LoaderCircle className="animate-spin" />

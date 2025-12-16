@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { PostHogProvider } from "../providers/PH";
 
 const manrope = Poppins({
   variable: "--font-manrope",
@@ -27,8 +28,10 @@ export default function RootLayout({
       <body
         className={`${manrope.variable} antialiased`}
       >
-        <Toaster position="top-right" />
-        {children}
+        <PostHogProvider>
+          <Toaster position="top-right" />
+          {children}
+        </PostHogProvider>
       </body>
     </html>
   );

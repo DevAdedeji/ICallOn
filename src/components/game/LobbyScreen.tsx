@@ -119,7 +119,7 @@ export default function LobbyScreen({ host, room, user, playerId }: { host?: Use
     }, [roomId])
 
 
-    const showStartButton = playerId === room.hostId && players.length > 2
+    const showStartButton = playerId === room.hostId && players.length > 1
 
     return (
         <main className="relative z-10 flex flex-1 flex-col items-center justify-center p-4 w-full">
