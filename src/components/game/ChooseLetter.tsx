@@ -17,6 +17,13 @@ export default function ChooseLetter({ onRoundStarted, roomId, roundNumber }: Ch
     const [error, setError] = useState<string | null>(null)
     const [isPending, setPending] = useState(false)
 
+    const handleLetterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value.toUpperCase()
+        if (value === '' || /^[A-Z]$/.test(value)) {
+            setLetter(value)
+        }
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setError(null)
@@ -51,12 +58,14 @@ export default function ChooseLetter({ onRoundStarted, roomId, roundNumber }: Ch
                 <div className="pt-2 flex flex-col gap-4">
                     <Input
                         type="text"
-                        placeholder="Letter"
+                        placeholder="Enter a letter (A-Z)"
                         required
                         value={letter}
-                        onChange={e => setLetter(e.target.value)}
+                        onChange={handleLetterChange}
                         disabled={isPending}
                         maxLength={1}
+                        className="text-center text-2xl font-bold uppercase"
+                        autoFocus
                     />
                     {error && (
                         <p className="text-red-500 text-sm font-medium -mt-2">
