@@ -97,6 +97,7 @@ export default async function PlayGamePage({
         )
     }
 
+
     switch (room.status) {
         case "lobby":
             return (

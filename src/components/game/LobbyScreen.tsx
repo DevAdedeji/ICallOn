@@ -9,11 +9,14 @@ import { toast } from 'sonner';
 import Button from "../ui/Button";
 import { supabase } from "@/src/lib/supabase/client";
 import { Player } from "@/src/db/schema";
+import { updateRoomStatus } from "@/src/actions/rooms";
+import { useRouter } from "next/navigation";
 
 export default function LobbyScreen({ host, room, user, playerId }: { host?: User, room: Room, user?: LoggedInUser, playerId?: string }) {
 
     const [players, setPlayers] = useState<Player[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [isStarting, setIsStarting] = useState(false)
 
     const shareLink = `/play/${room.id}`
     const copyGameLink = async () => {
@@ -121,6 +124,42 @@ export default function LobbyScreen({ host, room, user, playerId }: { host?: Use
 
     const showStartButton = playerId === room.hostId && players.length > 1
 
+    const router = useRouter()
+
+    useEffect(() => {
+        const channel = supabase.channel(`room-${roomId}-status`)
+            .on("postgres_changes", {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'rooms',
+                filter: `id=eq.${roomId}`
+            }, (payload) => {
+                const newStatus = payload.new.status
+
+                if (newStatus === "playing") {
+                    router.refresh()
+                }
+            }).subscribe()
+
+        return () => {
+            supabase.removeChannel(channel)
+        }
+    }, [roomId, router])
+
+    const startGame = async () => {
+        setIsStarting(true)
+
+        const result = await updateRoomStatus(roomId, "playing")
+
+        if (result?.success) {
+            router.refresh()
+        } else {
+            toast.error(result?.error ?? "Failed to start game")
+        }
+
+        setIsStarting(false)
+    }
+
     return (
         <main className="relative z-10 flex flex-1 flex-col items-center justify-center p-4 w-full">
             <div className="flex-1 flex flex-col items-center w-full px-4 sm:px-6 lg:px-10 py-8 max-w-360 mx-auto gap-8">
@@ -218,7 +257,9 @@ export default function LobbyScreen({ host, room, user, playerId }: { host?: Use
                         <Button
                             variant="primary"
                             className="md:w-auto"
-                            disabled={players.length === 0}
+                            disabled={players.length === 0 || isStarting}
+                            onClick={startGame}
+                            loading={isStarting}
                         >
                             <Play />
                             Start Game
