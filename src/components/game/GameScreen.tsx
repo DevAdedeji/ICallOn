@@ -1,10 +1,11 @@
 "use client"
 import { Room, Round, User } from "@/src/db/schema";
 import type { User as LoggedInUser } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import ChooseLetter from "./ChooseLetter";
 import InputAnswers from "./InputAnswers";
 import { supabase } from "@/src/lib/supabase/client";
+import { fetchRoundById } from "@/src/actions/rounds";
 
 export default function GameScreen({ host, room, user, playerId }: { host?: User, room: Room, user?: LoggedInUser, playerId?: string }) {
     const isHost = playerId === room.hostId

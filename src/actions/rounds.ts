@@ -53,3 +53,21 @@ export async function startRound(roomId: string, roundNumber: number, letter: st
         return { success: false, error: "Failed to start round" }
     }
 }
+
+
+export async function fetchRoundById(roundId: string) {
+    try {
+        const round = await db.query.rounds.findFirst({
+            where: eq(rounds.id, roundId)
+        })
+
+        if (!round) {
+            return { success: false, error: "Round not found", round: null }
+        }
+
+        return { success: true, round }
+    } catch (error) {
+        console.error("Fetch round error:", error)
+        return { success: false, error: "Failed to fetch round", round: null }
+    }
+}
