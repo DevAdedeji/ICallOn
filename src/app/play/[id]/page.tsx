@@ -7,6 +7,7 @@ import LobbyScreen from "@/src/components/game/LobbyScreen";
 import GameScreen from "@/src/components/game/GameScreen";
 import { cookies } from "next/headers";
 import JoinExecutor from "@/src/components/game/JoinExecutor";
+import { Room } from "@/src/db/schema";
 
 export default async function PlayGamePage({
     params
@@ -50,7 +51,7 @@ export default async function PlayGamePage({
     let player = null
 
     if (playerId) {
-        const playerResult = await fetchPlayerById(playerId)
+        const playerResult = await fetchPlayerById(playerId, roomId)
         if (playerResult.success && playerResult.player) {
             if (playerResult.player.room_id === roomId) {
                 player = playerResult.player
@@ -103,7 +104,7 @@ export default async function PlayGamePage({
             return (
                 <LobbyScreen
                     host={hostResult.user}
-                    room={room}
+                    room={room as Room}
                     user={user ?? undefined}
                     playerId={playerId ?? undefined}
                 />
@@ -113,7 +114,7 @@ export default async function PlayGamePage({
             return (
                 <GameScreen
                     host={hostResult.user}
-                    room={room}
+                    room={room as Room}
                     user={user ?? undefined}
                     playerId={playerId ?? undefined}
                 />

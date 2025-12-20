@@ -7,10 +7,13 @@ import { nanoid } from "nanoid";
 import { cookies } from "next/headers";
 import { and, eq } from "drizzle-orm"
 
-export async function fetchPlayerById(playerId: string) {
+export async function fetchPlayerById(playerId: string, roomId: string) {
     try {
         const player = await db.query.players.findFirst({
-            where: (players, { eq }) => eq(players.id, playerId)
+            where: and(
+                eq(players.id, playerId),
+                eq(players.room_id, roomId)
+            )
         })
 
         if (!player) {
@@ -57,7 +60,7 @@ export async function createOrGetPlayer(input: JoinInput) {
         const [player] = await db
             .insert(players)
             .values({
-                id: input.userId ?? nanoid(),
+                id: nanoid() ?? input.userId,
                 room_id: input.roomId,
                 user_id: input.userId ?? null,
                 display_name: input.displayName,

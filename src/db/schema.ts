@@ -17,6 +17,7 @@ export const rooms = pgTable("rooms", {
     maxRounds: integer("max_rounds").notNull().default(5),
     timePerRound: integer("time_per_round").notNull().default(60),
     currentRound: integer("current_round").notNull().default(0),
+    currentRoundId: text('current_round_id').references(() => rounds.id),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     startedAt: timestamp("started_at"),
     endedAt: timestamp("ended_at")
@@ -43,21 +44,26 @@ export const rounds = pgTable("rounds", {
     endedAt: timestamp("ended_at")
 })
 
+
 export const answers = pgTable("answers", {
     id: text("id").primaryKey(),
-    roundId: text("round_id").notNull().references(() => rounds.id, { onDelete: "cascade" }),
-    playerId: text("player_id").notNull().references(() => players.id, { onDelete: "cascade" }),
+    room_id: text("room_id").notNull().references(() => rooms.id, { onDelete: "cascade" }),
+    round_id: text("round_id").notNull().references(() => rounds.id, { onDelete: "cascade" }),
+    player_id: text("player_id").notNull().references(() => players.id, { onDelete: "cascade" }),
     animal: text("animal"),
     name: text("name"),
     place: text("place"),
     thing: text("thing"),
-    animalValid: boolean("animal_valid").default(false),
-    nameValid: boolean("name_valid").default(false),
-    placeValid: boolean("place_valid").default(false),
-    thingValid: boolean("thing_valid").default(false),
-    pointsEarned: integer("points_earned").notNull().default(0),
-    submittedAt: timestamp("submitted_at").defaultNow().notNull(),
-    validatedAt: timestamp("validated_at")
+    animal_valid: boolean("animal_valid").default(false),
+    name_valid: boolean("name_valid").default(false),
+    place_valid: boolean("place_valid").default(false),
+    thing_valid: boolean("thing_valid").default(false),
+    points_earned: integer("points_earned").notNull().default(0),
+    time_taken: integer("time_taken"),
+    submitted_at: timestamp("submitted_at"),
+    validated_at: timestamp("validated_at"),
+    created_at: timestamp("created_at").defaultNow().notNull(),
+    updated_at: timestamp("updated_at").defaultNow().notNull(),
 })
 
 // Users
@@ -74,3 +80,4 @@ export type Round = InferSelectModel<typeof rounds>
 
 // Answers
 export type Answer = InferSelectModel<typeof answers>
+

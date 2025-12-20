@@ -8,15 +8,12 @@ import { supabase } from "@/src/lib/supabase/client";
 import { fetchRoundById } from "@/src/actions/rounds";
 
 export default function GameScreen({ host, room, user, playerId }: { host?: User, room: Room, user?: LoggedInUser, playerId?: string }) {
-    const isHost = playerId === room.hostId
+    const isHost = user?.id === room.hostId
     const roomId = room.id
-    const [round, setRound] = useState<Partial<Round> | null>({
-        room_id: roomId,
-        round_number: 1,
-        status: "pending",
-        letter: ""
-    })
+    const [round, setRound] = useState<Partial<Round> | null>(null)
     const [currentRound, setCurrentRound] = useState<number>(1)
+    const [loading, setLoading] = useState(false)
+
 
     useEffect(() => {
         const channel = supabase
@@ -50,6 +47,40 @@ export default function GameScreen({ host, room, user, playerId }: { host?: User
         }
     }, [roomId, currentRound])
 
+    useEffect(() => {
+        const initializeRound = async () => {
+            if (!room.currentRoundId) {
+                // Reset round to initial state
+                setRound({
+                    room_id: room.id,
+                    round_number: 1,
+                    status: "pending",
+                    letter: ""
+                })
+                return
+            }
+
+            // Fetch current round if currentRoundId exists
+            setLoading(true)
+            const result = await fetchRoundById(room.currentRoundId)
+            if (result.success && result.round) {
+                setRound(result.round)
+            }
+            setLoading(false)
+        }
+
+        initializeRound()
+    }, [room.currentRoundId, room.id])
+
+
+
+    if (loading) {
+        return (
+            <main className="flex flex-1 items-center justify-center p-4 w-full">
+                <p>Loading round...</p>
+            </main>
+        )
+    }
 
     return (
         <main className="relative z-10 flex flex-1 flex-col items-center justify-center p-4 w-full">
@@ -60,7 +91,7 @@ export default function GameScreen({ host, room, user, playerId }: { host?: User
                 !isHost && round?.status === "pending" ? <p>Please wait while the host selects a letter</p> : <></>
             }
             {
-                round?.status === "active" ? <InputAnswers /> : <></>
+                round?.id && (round?.status === "active" || round?.status === "submitted") ? <InputAnswers room={room} round={round as Round} playerId={playerId} isHost={isHost} /> : <></>
             }
         </main>
     )

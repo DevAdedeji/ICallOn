@@ -61,14 +61,11 @@ export default function LobbyScreen({ host, room, user, playerId }: { host?: Use
                     filter: `room_id=eq.${roomId}`
                 },
                 (payload) => {
-                    console.log(payload)
                     if (isMounted) {
                         setPlayers(prev => {
                             if (prev.some(p => p.id === payload.new.id)) {
-                                console.log("⚠️ Duplicate player prevented:", payload.new.id)
                                 return prev
                             }
-                            console.log("➕ Adding new player:", payload.new)
                             return [...prev, payload.new as Player]
                         })
                         toast.success(`${(payload.new as Player).display_name} joined!`)
@@ -108,7 +105,7 @@ export default function LobbyScreen({ host, room, user, playerId }: { host?: Use
             )
             .subscribe((status) => {
                 if (status === "SUBSCRIBED") {
-                    console.log("Subscribed to lobby updates")
+                    //
                 } else if (status === "CHANNEL_ERROR") {
                     console.error("Subscription error")
                     toast.error("Real-time connection failed")
@@ -122,8 +119,9 @@ export default function LobbyScreen({ host, room, user, playerId }: { host?: Use
     }, [roomId])
 
 
-    const showStartButton = playerId === room.hostId && players.length > 1
-
+    const hostPlayer = players.find((player) => player.user_id === room.hostId)
+    const isHost = hostPlayer?.user_id === room.hostId && user?.id === room.hostId && playerId === hostPlayer?.id
+    const showStartButton = isHost && players.length > 1
     const router = useRouter()
 
     useEffect(() => {
@@ -212,7 +210,7 @@ export default function LobbyScreen({ host, room, user, playerId }: { host?: Use
                                             <div className="flex flex-col">
                                                 <span className="text-lg font-bold text-white leading-tight">{player.display_name}</span>
                                                 <span className="text-xs font-bold text-primary uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded w-fit mt-1">
-                                                    {room.hostId === player?.user_id ? "Host" : "Player"}
+                                                    {room.hostId === player.user_id ? "Host" : "Player"}
                                                 </span>
                                             </div>
                                         </div>

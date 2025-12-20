@@ -1,9 +1,9 @@
 'use server'
 
 import { db } from "@/src/db";
-import { rounds } from "@/src/db/schema";
+import { rounds, rooms } from "@/src/db/schema";
 import { nanoid } from "nanoid";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export async function startRound(roomId: string, roundNumber: number, letter: string,) {
     try {
@@ -45,6 +45,13 @@ export async function startRound(roomId: string, roundNumber: number, letter: st
             updatedRound = round
         }
 
+        await db
+            .update(rooms)
+            .set({
+                currentRoundId: updatedRound.id,
+                currentRound: roundNumber
+            })
+            .where(eq(rooms.id, roomId))
 
         return { success: true, round: updatedRound }
 
@@ -69,5 +76,27 @@ export async function fetchRoundById(roundId: string) {
     } catch (error) {
         console.error("Fetch round error:", error)
         return { success: false, error: "Failed to fetch round", round: null }
+    }
+}
+
+export async function finalizeRound(roundId: string) {
+    try {
+        const [updated] = await db
+            .update(rounds)
+            .set({
+                status: "submitted",
+                endedAt: new Date(),
+            })
+            .where(eq(rounds.id, roundId))
+            .returning()
+
+        if (!updated) {
+            throw new Error("Round not found")
+        }
+
+        return { success: true, round: updated }
+    } catch (error) {
+        console.error("Failed to finalize round:", error)
+        return { success: false, error: "Failed to finalize round" }
     }
 }
