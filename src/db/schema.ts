@@ -17,7 +17,7 @@ export const rooms = pgTable("rooms", {
     maxRounds: integer("max_rounds").notNull().default(5),
     timePerRound: integer("time_per_round").notNull().default(60),
     currentRound: integer("current_round").notNull().default(0),
-    currentRoundId: text("current_round_id").notNull(),
+    currentRoundId: text("current_round_id"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     startedAt: timestamp("started_at"),
     endedAt: timestamp("ended_at")
