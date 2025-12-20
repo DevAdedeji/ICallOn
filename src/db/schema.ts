@@ -50,7 +50,7 @@ export const answers = pgTable("answers", {
     room_id: text("room_id").notNull().references(() => rooms.id, { onDelete: "cascade" }),
     round_id: text("round_id").notNull().references(() => rounds.id, { onDelete: "cascade" }),
     player_id: text("player_id").notNull().references(() => players.id, { onDelete: "cascade" }),
-    player_name: text("name").notNull(),
+    player_name: text("player_name").notNull(),
     animal: text("animal"),
     name: text("name"),
     place: text("place"),

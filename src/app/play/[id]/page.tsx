@@ -32,19 +32,6 @@ export default async function PlayGamePage({
 
     const room = roomResult.room
 
-
-    if (room.status === "ended") {
-        return (
-            <main className="flex items-center justify-center h-screen">
-                <div className="glass-panel rounded-2xl p-8 text-center">
-                    <h1 className="text-2xl font-bold text-yellow-500 mb-2">Game Ended</h1>
-                    <p className="text-gray-400">This game has already finished</p>
-                </div>
-            </main>
-        )
-    }
-
-
     const supabase = await getSupabaseServerClient()
     const { data: { user } } = await supabase.auth.getUser()
 

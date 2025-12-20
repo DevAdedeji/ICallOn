@@ -3,7 +3,7 @@
 import { db } from "@/src/db";
 import { rounds, rooms } from "@/src/db/schema";
 import { nanoid } from "nanoid";
-import { eq, and } from "drizzle-orm";
+import { eq, } from "drizzle-orm";
 
 export async function startRound(roomId: string, roundNumber: number, letter: string,) {
     try {
@@ -98,5 +98,27 @@ export async function finalizeRound(roundId: string) {
     } catch (error) {
         console.error("Failed to finalize round:", error)
         return { success: false, error: "Failed to finalize round" }
+    }
+}
+
+export async function endRound(roundId: string) {
+    try {
+        const [updated] = await db
+            .update(rounds)
+            .set({
+                status: "ended",
+                endedAt: new Date(),
+            })
+            .where(eq(rounds.id, roundId))
+            .returning()
+
+        if (!updated) {
+            throw new Error("Round not found")
+        }
+
+        return { success: true, round: updated }
+    } catch (error) {
+        console.error("Failed to end round:", error)
+        return { success: false, error: "Failed to end round" }
     }
 }

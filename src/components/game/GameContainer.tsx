@@ -8,13 +8,13 @@ import { supabase } from "@/src/lib/supabase/client";
 import GameScreen from "./GameScreen";
 import LobbyScreen from "./LobbyScreen";
 
-export const GameContainer = ({ host, room, user, player }: { host?: User, room: Room, user?: LoggedInUser, player?: Player }) => {
+export const GameContainer = ({ host, room: initialRoom, user, player }: { host?: User, room: Room, user?: LoggedInUser, player?: Player }) => {
 
-
-    const roomId = room.id
-
+    const roomId = initialRoom.id
+    const [room, setRoom] = useState<Room>(initialRoom)
     const [players, setPlayers] = useState<Player[]>([])
     const [isLoading, setIsLoading] = useState(true)
+
 
     useEffect(() => {
         let isMounted = true
@@ -38,6 +38,26 @@ export const GameContainer = ({ host, room, user, player }: { host?: User, room:
 
         const channel = supabase
             .channel(`room-${roomId}-lobby`)
+            .on(
+                "postgres_changes",
+                {
+                    event: "UPDATE",
+                    schema: "public",
+                    table: "rooms",
+                    filter: `id=eq.${roomId}`
+                },
+                (payload) => {
+                    if (isMounted) {
+                        const updatedRoom = payload.new as Room
+                        setRoom(updatedRoom)
+                        if (updatedRoom.status === 'ended') {
+                            toast.info('Game has ended!')
+                        } else if (updatedRoom.status === 'playing') {
+                            toast.success('Game started!')
+                        }
+                    }
+                }
+            )
             .on(
                 "postgres_changes",
                 {
@@ -103,31 +123,39 @@ export const GameContainer = ({ host, room, user, player }: { host?: User, room:
             supabase.removeChannel(channel)
         }
     }, [roomId])
-    switch (room.status) {
 
+
+    switch (room.status) {
         case "lobby":
             return (
                 <LobbyScreen
                     host={host}
-                    room={room as Room}
+                    room={initialRoom as Room}
                     user={user ?? undefined}
                     player={player}
                     players={players}
                     isLoading={isLoading}
                 />
             )
-
         case "playing":
             return (
                 <GameScreen
                     host={host}
-                    room={room as Room}
+                    room={initialRoom as Room}
                     user={user as LoggedInUser}
                     player={player as Player}
                     players={players as Player[]}
                 />
             )
-
+        case "ended":
+            return (
+                <main className="flex items-center justify-center h-screen">
+                    <div className="glass-panel rounded-2xl p-8 text-center">
+                        <h1 className="text-2xl font-bold text-yellow-500 mb-2">Game Ended</h1>
+                        <p className="text-gray-400">This game has already finished</p>
+                    </div>
+                </main>
+            )
         default:
             return (
                 <main className="flex items-center justify-center h-screen">

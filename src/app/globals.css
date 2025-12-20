@@ -37,6 +37,10 @@ body {
   letter-spacing: 1px;
 }
 
+.bg-danger {
+  background-color: red;
+}
+
 .hero-glow {
   background-image: radial-gradient(circle at 50% 0%, rgba(70, 236, 19, 0.15) 0%, rgba(15, 17, 16, 0) 50%);
 }

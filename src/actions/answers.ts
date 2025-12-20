@@ -156,9 +156,9 @@ export async function submitPlayerAnswers(
     }
 }
 
-export async function fetchAnswers(roundId: string) {
+export async function fetchRoundAnswers(roundId: string) {
     try {
-        const answer = await db.query.answers.findFirst({
+        const answer = await db.query.answers.findMany({
             where: and(
                 eq(answers.round_id, roundId),
             )
@@ -175,5 +175,45 @@ export async function fetchAnswers(roundId: string) {
             error: "Failed to fetch answers",
             answers: null
         }
+    }
+}
+
+type AnswerValidation = {
+    id: string;
+    name_valid: boolean;
+    animal_valid: boolean;
+    place_valid: boolean;
+    thing_valid: boolean;
+    points_earned: number;
+};
+
+export async function confirmRoundAnswers(
+    validatedAnswers: AnswerValidation[]
+) {
+    try {
+        await db.transaction(async (tx) => {
+            for (const answer of validatedAnswers) {
+                await tx
+                    .update(answers)
+                    .set({
+                        name_valid: answer.name_valid,
+                        animal_valid: answer.animal_valid,
+                        place_valid: answer.place_valid,
+                        thing_valid: answer.thing_valid,
+                        points_earned: answer.points_earned,
+                        validated_at: new Date(),
+                        updated_at: new Date(),
+                    })
+                    .where(eq(answers.id, answer.id));
+            }
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error("Confirm round answers error:", error);
+        return {
+            success: false,
+            error: "Failed to confirm round answers",
+        };
     }
 }

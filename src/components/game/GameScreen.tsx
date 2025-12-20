@@ -6,9 +6,9 @@ import ChooseLetter from "./ChooseLetter";
 import InputAnswers from "./InputAnswers";
 import { supabase } from "@/src/lib/supabase/client";
 import { fetchRoundById } from "@/src/actions/rounds";
+import { updateRoomStatus } from "@/src/actions/rooms";
 
 export default function GameScreen({ host, room, user, player, players }: { host?: User, room: Room, user?: LoggedInUser, player?: Player, players: Player[] }) {
-    const playerId = player?.id
     const isHost = user?.id === room.hostId
     const roomId = room.id
     const [round, setRound] = useState<Partial<Round> | null>(null)
@@ -74,6 +74,25 @@ export default function GameScreen({ host, room, user, player, players }: { host
     }, [room.currentRoundId, room.id])
 
 
+    useEffect(() => {
+        if (round?.status !== "ended") return;
+        if (currentRound >= room.maxRounds && isHost) {
+            updateRoomStatus(room.id, "ended")
+            return;
+        };
+        const startNextRound = () => {
+            setCurrentRound(prev => prev + 1)
+            setRound(prev => ({
+                ...prev,
+                round_number: prev?.round_number ? prev.round_number + 1 : currentRound + 1,
+                status: "pending",
+                letter: ""
+            }))
+
+        }
+        startNextRound();
+    }, [round?.status, isHost, currentRound, room.id, room.maxRounds]);
+
 
     if (loading) {
         return (
@@ -83,16 +102,17 @@ export default function GameScreen({ host, room, user, player, players }: { host
         )
     }
 
+
     return (
         <main className="relative z-10 flex flex-1 flex-col items-center justify-center p-4 w-full">
             {
-                isHost && round?.status == "pending" ? <ChooseLetter onRoundStarted={(updatedRound) => setRound(updatedRound)} roomId={roomId} roundNumber={currentRound} /> : <></>
+                isHost && round?.status == "pending" && (<ChooseLetter onRoundStarted={(updatedRound) => setRound(updatedRound)} roomId={roomId} roundNumber={currentRound} />)
             }
             {
-                !isHost && round?.status === "pending" ? <p>Please wait while the host selects a letter</p> : <></>
+                !isHost && round?.status === "pending" && (<p>Please wait while the host selects a letter</p>)
             }
             {
-                round?.id && (round?.status === "active" || round?.status === "submitted") ? <InputAnswers room={room as Room} round={round as Round} player={player as Player} isHost={isHost} /> : <></>
+                round?.id && (round?.status === "active" || round?.status === "submitted") && (<InputAnswers room={room as Room} round={round as Round} player={player as Player} isHost={isHost} />)
             }
         </main>
     )
