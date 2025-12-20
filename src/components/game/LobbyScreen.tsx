@@ -1,6 +1,6 @@
 "use client"
 
-import { Room, User } from "@/src/db/schema";
+import { Room, User, Player } from "@/src/db/schema";
 import type { User as LoggedInUser } from "@supabase/supabase-js";
 import { useEffect, useState } from "react"
 import { Copy, Timer, RotateCw, Settings, Users, Play, User as UserIcon } from "lucide-react";
@@ -8,14 +8,12 @@ import { copyToClipboard } from "@/src/lib/utils";
 import { toast } from "sonner";
 import Button from "../ui/Button";
 import { supabase } from "@/src/lib/supabase/client";
-import { Player } from "@/src/db/schema";
 import { updateRoomStatus } from "@/src/actions/rooms";
 import { useRouter } from "next/navigation";
 
-export default function LobbyScreen({ host, room, user, playerId }: { host?: User, room: Room, user?: LoggedInUser, playerId?: string }) {
+export default function LobbyScreen({ host, room, user, player, players, isLoading }: { host?: User, room: Room, user?: LoggedInUser, player?: Player, players: Player[], isLoading: boolean }) {
 
-    const [players, setPlayers] = useState<Player[]>([])
-    const [isLoading, setIsLoading] = useState(true)
+    const playerId = player?.id
     const [isStarting, setIsStarting] = useState(false)
 
     const shareLink = `/play/${room.id}`
@@ -30,93 +28,7 @@ export default function LobbyScreen({ host, room, user, playerId }: { host?: Use
 
     const roomId = room.id
 
-    useEffect(() => {
-        let isMounted = true
 
-        const fetchPlayers = async () => {
-            const { data, error } = await supabase
-                .from("players")
-                .select("*")
-                .eq("room_id", roomId)
-
-            if (error) {
-                console.error("Failed to fetch players:", error)
-                toast.error("Failed to load players")
-            } else if (isMounted) {
-                setPlayers(data ?? [])
-            }
-            setIsLoading(false)
-        }
-
-        fetchPlayers()
-
-        const channel = supabase
-            .channel(`room-${roomId}-lobby`)
-            .on(
-                "postgres_changes",
-                {
-                    event: "INSERT",
-                    schema: "public",
-                    table: "players",
-                    filter: `room_id=eq.${roomId}`
-                },
-                (payload) => {
-                    if (isMounted) {
-                        setPlayers(prev => {
-                            if (prev.some(p => p.id === payload.new.id)) {
-                                return prev
-                            }
-                            return [...prev, payload.new as Player]
-                        })
-                        toast.success(`${(payload.new as Player).display_name} joined!`)
-                    }
-                }
-            )
-            .on(
-                "postgres_changes",
-                {
-                    event: "UPDATE",
-                    schema: "public",
-                    table: "players",
-                    filter: `room_id=eq.${roomId}`
-                },
-                (payload) => {
-                    if (isMounted) {
-                        setPlayers(prev =>
-                            prev.map(p => p.id === payload.new.id ? payload.new as Player : p)
-                        )
-                    }
-                }
-            )
-            .on(
-                "postgres_changes",
-                {
-                    event: "DELETE",
-                    schema: "public",
-                    table: "players",
-                    filter: `room_id=eq.${roomId}`
-                },
-                (payload) => {
-                    if (isMounted) {
-                        setPlayers(prev => prev.filter(p => p.id !== payload.old.id))
-                        toast.info(`${(payload.old as Player).display_name} left`)
-                    }
-                }
-            )
-            .subscribe((status) => {
-                if (status === "SUBSCRIBED") {
-                    //
-                } else if (status === "CHANNEL_ERROR") {
-                    console.error("Subscription error")
-                    toast.error("Real-time connection failed")
-                }
-            })
-
-        return () => {
-            isMounted = false
-            supabase.removeChannel(channel)
-        }
-    }, [roomId])
 
 
     const hostPlayer = players.find((player) => player.user_id === room.hostId)

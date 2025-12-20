@@ -1,15 +1,17 @@
 "use client"
 import Input from "../ui/Input";
 import Button from "../ui/Button";
-import { Room, Round } from "@/src/db/schema";
+import { Player, Room, Round } from "@/src/db/schema";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useDebounce } from "@/src/hooks/useDebounce";
 import { savePlayerAnswers, fetchPlayerAnswers, submitPlayerAnswers } from "@/src/actions/answers";
 import { toast } from "sonner";
 import { finalizeRound } from "@/src/actions/rounds";
+import { Check, X } from "lucide-react";
 
-export default function InputAnswers({ room, round, playerId, isHost }: { room: Room, round: Round, playerId?: string, isHost: boolean }) {
+export default function InputAnswers({ room, round, player, isHost }: { room: Room, round: Round, player?: Player, isHost: boolean }) {
 
+    const playerId = player?.id
     const [isSubmitted, setIsSubmitted] = useState(false)
 
     useEffect(() => {
@@ -17,6 +19,7 @@ export default function InputAnswers({ room, round, playerId, isHost }: { room: 
             if (!playerId || !round.id) return
 
             const result = await fetchPlayerAnswers(playerId, round.id, room.id)
+            console.log(result.answers)
             if (result.success && result.answers) {
                 setAnswers({
                     name: result.answers.name ?? '',
@@ -45,8 +48,9 @@ export default function InputAnswers({ room, round, playerId, isHost }: { room: 
             roundId: round.id,
             roomId: room.id,
             answers: debouncedAnswers,
+            player_name: player.display_name
         })
-    }, [debouncedAnswers, playerId, round.id, room.id, isSubmitted])
+    }, [debouncedAnswers, playerId, round.id, room.id, isSubmitted, player?.display_name])
 
     const hasFinalizedRound = useRef(false)
 
@@ -76,11 +80,15 @@ export default function InputAnswers({ room, round, playerId, isHost }: { room: 
                 timeTaken,
                 room.id,
                 debouncedAnswers,
+                player.display_name
             )
             if (result.success) {
                 setIsSubmitted(true)
                 toast.success("Answers submitted!")
                 hasSubmitted.current = true
+                if (isHost) {
+                    finalizeRound(round.id)
+                }
             } else {
                 hasSubmitted.current = false
                 toast.error("Failed to submit answers")
@@ -91,7 +99,7 @@ export default function InputAnswers({ room, round, playerId, isHost }: { room: 
             setIsLoading(false)
         }
 
-    }, [hasSubmitted, playerId, round.id, room.id, debouncedAnswers, timeLeft, room.timePerRound])
+    }, [hasSubmitted, playerId, round.id, room.id, debouncedAnswers, timeLeft, room.timePerRound, player?.display_name, isHost])
 
     useEffect(() => {
         setTimeLeft(getTimeLeft())
@@ -171,8 +179,139 @@ export default function InputAnswers({ room, round, playerId, isHost }: { room: 
     }
 
     if (round.status === "submitted" || hasSubmitted) {
-        return isHost ? <div> Hello
-        </div> :
+        return isHost ? (
+            <div>
+                <div className="flex flex-wrap justify-between items-end gap-4 mb-8">
+                    <div className="flex flex-col gap-2">
+                        <h1 className="text-white tracking-tight text-3xl md:text-4xl font-extrabold leading-tight">Review Answers</h1>
+                        <p className="text-text-secondary text-base font-normal max-w-2xl">Validate player answers to finalize scoring. Click checkmarks to approve or crosses to reject. Use bulk actions for speed.</p>
+                    </div>
+                </div>
+                <div className="w-full overflow-x-auto rounded-xl border border-border-dark bg-surface-dark/50 shadow-2xl">
+                    <table className="min-w-[1000px] border-collapse">
+                        <thead>
+                            <tr>
+                                <th className="sticky left-0 z-20 bg-[#1e271c] border-b border-r border-border-dark p-4 text-xs font-bold text-text-secondary uppercase tracking-widest text-left">
+                                    Players
+                                </th>
+                                <th className="border-b border-r border-border-dark bg-[#1e271c] p-4 text-left">
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <h3 className="text-white font-bold text-lg">Name</h3>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </th>
+                                <th className="border-b border-r border-border-dark bg-[#1e271c] p-4 text-left">
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <h3 className="text-white font-bold text-lg">Animal</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th className="border-b border-r border-border-dark bg-[#1e271c] p-4 text-left">
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <h3 className="text-white font-bold text-lg">Place</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th className="border-b border-r border-border-dark bg-[#1e271c] p-4 text-left">
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <h3 className="text-white font-bold text-lg">Thing</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th className="sticky right-0 z-20 border-b border-l border-border-dark bg-[#1e271c] p-4 text-center shadow-[-4px_0_12px_rgba(0,0,0,0.5)] text-xs font-bold text-text-secondary uppercase tracking-widest">
+                                    Total Score
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr className="bg-[#131811] border-b border-border-dark">
+                                <td className="sticky left-0 z-10 p-4 flex items-center gap-3 shadow-[4px_0_12px_rgba(0,0,0,0.5)]">
+                                    <div className="flex flex-col">
+                                        <span className="text-white font-bold text-sm">Alice (You)</span>
+                                        <span className="text-xs text-primary bg-primary/10 px-1.5 py-0.5 rounded w-fit mt-1">Host</span>
+                                    </div>
+                                </td>
+                                <td className="p-3">
+                                    <div className="w-full h-full bg-[#1e271c] border border-primary/40 rounded-lg p-3 flex items-center justify-between group relative overflow-hidden">
+                                        <div className="absolute inset-0 bg-primary/5 pointer-events-none"></div>
+                                        <span className="text-white font-medium pl-1 text-lg">Matrix</span>
+                                        <div className="flex gap-1 z-10">
+                                            <button className="size-8 rounded flex items-center justify-center bg-primary text-black hover:scale-105 transition-transform">
+                                                <Check />
+                                            </button>
+                                            <button className="size-8 rounded flex items-center justify-center bg-[#2c3928] text-text-secondary hover:bg-danger hover:text-white transition-colors">
+                                                <X />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="p-3">
+                                    <div className="w-full h-full bg-[#1e271c] border border-primary/40 rounded-lg p-3 flex items-center justify-between group relative overflow-hidden">
+                                        <div className="absolute inset-0 bg-primary/5 pointer-events-none"></div>
+                                        <span className="text-white font-medium pl-1 text-lg">Manchester</span>
+                                        <div className="flex gap-1 z-10">
+                                            <button className="size-8 rounded flex items-center justify-center bg-primary text-black hover:scale-105 transition-transform">
+                                                <Check />
+                                            </button>
+                                            <button className="size-8 rounded flex items-center justify-center bg-[#2c3928] text-text-secondary hover:bg-danger hover:text-white transition-colors">
+                                                <X />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="p-3">
+                                    <div className="w-full h-full bg-[#1e271c] border border-primary/40 rounded-lg p-3 flex items-center justify-between group relative overflow-hidden">
+                                        <div className="absolute inset-0 bg-primary/5 pointer-events-none"></div>
+                                        <span className="text-white font-medium pl-1 text-lg">Mango</span>
+                                        <div className="flex gap-1 z-10">
+                                            <button className="size-8 rounded flex items-center justify-center bg-primary text-black hover:scale-105 transition-transform">
+                                                <Check />
+                                            </button>
+                                            <button className="size-8 rounded flex items-center justify-center bg-[#2c3928] text-text-secondary hover:bg-danger hover:text-white transition-colors">
+                                                <X />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="p-3">
+                                    <div className="w-full h-full bg-[#1e271c] border border-primary/40 rounded-lg p-3 flex items-center justify-between group relative overflow-hidden">
+                                        <div className="absolute inset-0 bg-primary/5 pointer-events-none"></div>
+                                        <span className="text-white font-medium pl-1 text-lg">Mango</span>
+                                        <div className="flex gap-1 z-10">
+                                            <button className="size-8 rounded flex items-center justify-center bg-primary text-black hover:scale-105 transition-transform">
+                                                <Check />
+                                            </button>
+                                            <button className="size-8 rounded flex items-center justify-center bg-[#2c3928] text-text-secondary hover:bg-danger hover:text-white transition-colors">
+                                                <X />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="sticky right-0 z-10 border-l border-border-dark bg-[#131811] p-3 flex items-center justify-center shadow-[-4px_0_12px_rgba(0,0,0,0.5)]">
+                                    <span className="text-2xl font-bold text-primary">30</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        ) :
             <div className="space-y-8">
                 <div className="glass-panel rounded-2xl p-8 text-center">
                     <div className="flex flex-col items-center gap-4">

@@ -39,9 +39,10 @@ export async function savePlayerAnswers(data: {
         thing?: string
     }
     roomId: string
+    player_name: string
 }) {
     try {
-        const { playerId, roundId, answers: answerData, roomId } = data
+        const { playerId, roundId, answers: answerData, roomId, player_name } = data
 
         const existing = await db.query.answers.findFirst({
             where: and(
@@ -78,6 +79,7 @@ export async function savePlayerAnswers(data: {
                     id: answerId,
                     room_id: roomId,
                     player_id: playerId,
+                    player_name,
                     round_id: roundId,
                     name: answerData.name || null,
                     animal: answerData.animal || null,
@@ -108,7 +110,8 @@ export async function submitPlayerAnswers(
         animal?: string
         place?: string
         thing?: string
-    }
+    },
+    player_name: string
 ) {
     try {
         let [result] = await db
@@ -133,6 +136,7 @@ export async function submitPlayerAnswers(
                     id: answerId,
                     room_id: roomId,
                     player_id: playerId,
+                    player_name,
                     round_id: roundId,
                     name: answerData.name || null,
                     animal: answerData.animal || null,
@@ -148,6 +152,28 @@ export async function submitPlayerAnswers(
         return {
             success: false,
             error: "Failed to submit answers"
+        }
+    }
+}
+
+export async function fetchAnswers(roundId: string) {
+    try {
+        const answer = await db.query.answers.findFirst({
+            where: and(
+                eq(answers.round_id, roundId),
+            )
+        })
+
+        return {
+            success: true,
+            answers: answer || null,
+        }
+    } catch (error) {
+        console.error("Fetch answers error:", error)
+        return {
+            success: false,
+            error: "Failed to fetch answers",
+            answers: null
         }
     }
 }

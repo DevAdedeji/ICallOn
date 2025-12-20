@@ -7,7 +7,9 @@ import LobbyScreen from "@/src/components/game/LobbyScreen";
 import GameScreen from "@/src/components/game/GameScreen";
 import { cookies } from "next/headers";
 import JoinExecutor from "@/src/components/game/JoinExecutor";
-import { Room } from "@/src/db/schema";
+import { Player, Room } from "@/src/db/schema";
+import { GameContainer } from "@/src/components/game/GameContainer";
+import { User } from "@supabase/supabase-js";
 
 export default async function PlayGamePage({
     params
@@ -99,35 +101,10 @@ export default async function PlayGamePage({
     }
 
 
-    switch (room.status) {
-        case "lobby":
-            return (
-                <LobbyScreen
-                    host={hostResult.user}
-                    room={room as Room}
-                    user={user ?? undefined}
-                    playerId={playerId ?? undefined}
-                />
-            )
-
-        case "playing":
-            return (
-                <GameScreen
-                    host={hostResult.user}
-                    room={room as Room}
-                    user={user ?? undefined}
-                    playerId={playerId ?? undefined}
-                />
-            )
-
-        default:
-            return (
-                <main className="flex items-center justify-center h-screen">
-                    <div className="glass-panel rounded-2xl p-8 text-center">
-                        <h1 className="text-2xl font-bold text-yellow-500 mb-2">Unknown Status</h1>
-                        <p className="text-gray-400">This room is in an unknown state: {room.status}</p>
-                    </div>
-                </main>
-            )
-    }
+    return (
+        <GameContainer host={hostResult.user}
+            room={room as Room}
+            user={user as User}
+            player={player as Player} />
+    )
 }

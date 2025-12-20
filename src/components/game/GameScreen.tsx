@@ -1,13 +1,14 @@
 "use client"
-import { Room, Round, User } from "@/src/db/schema";
+import { Player, Room, Round, User } from "@/src/db/schema";
 import type { User as LoggedInUser } from "@supabase/supabase-js";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState } from "react";
 import ChooseLetter from "./ChooseLetter";
 import InputAnswers from "./InputAnswers";
 import { supabase } from "@/src/lib/supabase/client";
 import { fetchRoundById } from "@/src/actions/rounds";
 
-export default function GameScreen({ host, room, user, playerId }: { host?: User, room: Room, user?: LoggedInUser, playerId?: string }) {
+export default function GameScreen({ host, room, user, player, players }: { host?: User, room: Room, user?: LoggedInUser, player?: Player, players: Player[] }) {
+    const playerId = player?.id
     const isHost = user?.id === room.hostId
     const roomId = room.id
     const [round, setRound] = useState<Partial<Round> | null>(null)
@@ -91,7 +92,7 @@ export default function GameScreen({ host, room, user, playerId }: { host?: User
                 !isHost && round?.status === "pending" ? <p>Please wait while the host selects a letter</p> : <></>
             }
             {
-                round?.id && (round?.status === "active" || round?.status === "submitted") ? <InputAnswers room={room} round={round as Round} playerId={playerId} isHost={isHost} /> : <></>
+                round?.id && (round?.status === "active" || round?.status === "submitted") ? <InputAnswers room={room as Room} round={round as Round} player={player as Player} isHost={isHost} /> : <></>
             }
         </main>
     )
