@@ -17,7 +17,7 @@ export const rooms = pgTable("rooms", {
     maxRounds: integer("max_rounds").notNull().default(5),
     timePerRound: integer("time_per_round").notNull().default(60),
     currentRound: integer("current_round").notNull().default(0),
-    currentRoundId: text('current_round_id').references(() => rounds.id),
+    currentRoundId: text("current_round_id").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     startedAt: timestamp("started_at"),
     endedAt: timestamp("ended_at")
@@ -50,7 +50,7 @@ export const answers = pgTable("answers", {
     room_id: text("room_id").notNull().references(() => rooms.id, { onDelete: "cascade" }),
     round_id: text("round_id").notNull().references(() => rounds.id, { onDelete: "cascade" }),
     player_id: text("player_id").notNull().references(() => players.id, { onDelete: "cascade" }),
-    player_name: text("player_name").notNull(),
+    player_name: text("name").notNull(),
     animal: text("animal"),
     name: text("name"),
     place: text("place"),
@@ -81,4 +81,3 @@ export type Round = InferSelectModel<typeof rounds>
 
 // Answers
 export type Answer = InferSelectModel<typeof answers>
-
