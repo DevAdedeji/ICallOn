@@ -51,7 +51,6 @@ export default function GameScreen({ host, room, user, player, players }: { host
     useEffect(() => {
         const initializeRound = async () => {
             if (!room.currentRoundId) {
-                // Reset round to initial state
                 setRound({
                     room_id: room.id,
                     round_number: 1,
@@ -101,7 +100,6 @@ export default function GameScreen({ host, room, user, player, players }: { host
             </main>
         )
     }
-
 
     return (
         <main className="relative z-10 flex flex-1 flex-col items-center justify-center p-4 w-full">

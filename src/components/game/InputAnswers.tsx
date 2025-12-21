@@ -108,11 +108,14 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
         if (isSubmitted) return
 
         const interval = setInterval(() => {
-            setTimeLeft(getTimeLeft())
+            setTimeLeft(prev => {
+                if (prev <= 0) return 0
+                return prev - 1
+            })
         }, 1000)
 
         return () => clearInterval(interval)
-    }, [isSubmitted, handleSubmit, getTimeLeft])
+    }, [isSubmitted])
 
     const isUrgent = timeLeft <= 10
     const isCritical = timeLeft <= 5
@@ -135,7 +138,7 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
     }, [timeLeft, isHost, playerId, handleSubmit, round.id, round.status])
 
 
-    if (round.status === "active") {
+    if (round.status === "active" && !isSubmitted) {
         return (
             <div className="space-y-8">
 
@@ -194,5 +197,27 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
                     </div>
                 </div>
             </div>
+    }
+
+    if (round.status === "ended") {
+        return (
+            <div className="space-y-8">
+                <div className="glass-panel rounded-2xl p-8 text-center">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="size-16 rounded-full bg-primary/20 flex items-center justify-center">
+                            <svg className="size-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-bold text-white mb-2">Round Complete!</h2>
+                            <p className="text-gray-400">
+                                {isHost ? "Starting next round..." : "Waiting for next round..."}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
     }
 }

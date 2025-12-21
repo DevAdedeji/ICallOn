@@ -10,15 +10,26 @@ export default function ReviewAnswers({ room, round, player }: { room: Room, rou
 
     const playerId = player?.id
     const [answers, setAnswers] = useState<Answer[]>([])
+    const [isFetching, setIsFetching] = useState(false);
 
     useEffect(() => {
         const loadAnswers = async () => {
             if (!round.id) return
-            const result = await fetchRoundAnswers(round.id)
-            if (result.success && result.answers) {
-                setAnswers(result.answers)
+
+            setIsFetching(true)
+            await new Promise(resolve => setTimeout(resolve, 2000))
+            try {
+                const result = await fetchRoundAnswers(round.id)
+                if (result.success && result.answers) {
+                    setAnswers(result.answers)
+                }
+            } catch (error) {
+                console.error('Failed to load answers:', error)
+            } finally {
+                setIsFetching(false)
             }
         }
+
         loadAnswers()
     }, [round.id])
 
@@ -147,148 +158,181 @@ export default function ReviewAnswers({ room, round, player }: { room: Room, rou
                     </thead>
                     <tbody>
                         {
-                            answers.map((answer) => (
-                                <tr key={answer.id} className="bg-[#131811] border-b border-border-dark">
-                                    <td className="sticky left-0 z-10 p-4 flex items-center gap-3 shadow-[4px_0_12px_rgba(0,0,0,0.5)]">
-                                        <div className="flex flex-col">
-                                            <span className="text-white font-bold text-sm">{answer.player_name}</span>
-                                            {playerId === answer.player_id && <span className="text-xs text-primary bg-primary/10 px-1.5 py-0.5 rounded w-fit mt-1">You</span>}
+                            isFetching ? (
+                                <tr>
+                                    <td colSpan={6} className="p-12">
+                                        <div className="flex flex-col items-center justify-center gap-4">
+                                            <svg className="animate-spin h-10 w-10 text-primary" viewBox="0 0 24 24">
+                                                <circle
+                                                    className="opacity-25"
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                    stroke="currentColor"
+                                                    strokeWidth="4"
+                                                    fill="none"
+                                                />
+                                                <path
+                                                    className="opacity-75"
+                                                    fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                />
+                                            </svg>
+                                            <p className="text-gray-400 font-semibold">Loading answers...</p>
                                         </div>
-                                    </td>
-                                    <td className="p-3">
-                                        <div className="w-full h-full bg-[#1e271c] border border-primary/40 rounded-lg p-3 flex items-center justify-between group relative overflow-hidden">
-                                            <div className="absolute inset-0 bg-primary/5 pointer-events-none"></div>
-                                            <span className="text-white font-medium pl-1 text-base">{answer.name}</span>
-                                            <div className="flex gap-1 z-10">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => markAsValid(answer.id, "name", true)}
-                                                    className={`size-6 rounded flex items-center justify-center transition
-    ${answer.name_valid
-                                                            ? "bg-primary text-black"
-                                                            : "bg-[#2c3928] text-text-secondary hover:bg-primary hover:text-black"
-                                                        }`}
-                                                >
-                                                    <Check size={14} />
-                                                </button>
-
-                                                <button
-                                                    type="button"
-                                                    onClick={() => markAsValid(answer.id, "name", false)}
-                                                    className={`size-6 rounded flex items-center justify-center transition
-    ${answer.name_valid === false
-                                                            ? "bg-danger text-white"
-                                                            : "bg-[#2c3928] text-text-secondary hover:bg-danger hover:text-white"
-                                                        }`}
-                                                >
-                                                    <X size={14} />
-                                                </button>
-
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="p-3">
-                                        <div className="w-full h-full bg-[#1e271c] border border-primary/40 rounded-lg p-3 flex items-center justify-between group relative overflow-hidden">
-                                            <div className="absolute inset-0 bg-primary/5 pointer-events-none"></div>
-                                            <span className="text-white font-medium pl-1 text-base">{answer.animal}</span>
-                                            <div className="flex gap-1 z-10">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => markAsValid(answer.id, "animal", true)}
-                                                    className={`size-6 rounded flex items-center justify-center transition
-    ${answer.animal_valid
-                                                            ? "bg-primary text-black"
-                                                            : "bg-[#2c3928] text-text-secondary hover:bg-primary hover:text-black"
-                                                        }`}
-                                                >
-                                                    <Check size={14} />
-                                                </button>
-
-                                                <button
-                                                    type="button"
-                                                    onClick={() => markAsValid(answer.id, "animal", false)}
-                                                    className={`size-6 rounded flex items-center justify-center transition
-    ${answer.animal_valid === false
-                                                            ? "bg-danger text-white"
-                                                            : "bg-[#2c3928] text-text-secondary hover:bg-danger hover:text-white"
-                                                        }`}
-                                                >
-                                                    <X size={14} />
-                                                </button>
-
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="p-3">
-                                        <div className="w-full h-full bg-[#1e271c] border border-primary/40 rounded-lg p-3 flex items-center justify-between group relative overflow-hidden">
-                                            <div className="absolute inset-0 bg-primary/5 pointer-events-none"></div>
-                                            <span className="text-white font-medium pl-1 text-base">{answer.place}</span>
-                                            <div className="flex gap-1 z-10">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => markAsValid(answer.id, "place", true)}
-                                                    className={`size-6 rounded flex items-center justify-center transition
-    ${answer.place_valid
-                                                            ? "bg-primary text-black"
-                                                            : "bg-[#2c3928] text-text-secondary hover:bg-primary hover:text-black"
-                                                        }`}
-                                                >
-                                                    <Check size={14} />
-                                                </button>
-
-                                                <button
-                                                    type="button"
-                                                    onClick={() => markAsValid(answer.id, "place", false)}
-                                                    className={`size-6 rounded flex items-center justify-center transition
-    ${answer.place_valid === false
-                                                            ? "bg-danger text-white"
-                                                            : "bg-[#2c3928] text-text-secondary hover:bg-danger hover:text-white"
-                                                        }`}
-                                                >
-                                                    <X size={14} />
-                                                </button>
-
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="p-3">
-                                        <div className="w-full h-full bg-[#1e271c] border border-primary/40 rounded-lg p-3 flex items-center justify-between group relative overflow-hidden">
-                                            <div className="absolute inset-0 bg-primary/5 pointer-events-none"></div>
-                                            <span className="text-white font-medium pl-1 text-base">{answer.thing}</span>
-                                            <div className="flex gap-1 z-10">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => markAsValid(answer.id, "thing", true)}
-                                                    className={`size-6 rounded flex items-center justify-center transition
-    ${answer.thing_valid
-                                                            ? "bg-primary text-black"
-                                                            : "bg-[#2c3928] text-text-secondary hover:bg-primary hover:text-black"
-                                                        }`}
-                                                >
-                                                    <Check size={14} />
-                                                </button>
-
-                                                <button
-                                                    type="button"
-                                                    onClick={() => markAsValid(answer.id, "thing", false)}
-                                                    className={`size-6 rounded flex items-center justify-center transition
-    ${answer.thing_valid === false
-                                                            ? "bg-danger text-white"
-                                                            : "bg-[#2c3928] text-text-secondary hover:bg-danger hover:text-white"
-                                                        }`}
-                                                >
-                                                    <X size={14} />
-                                                </button>
-
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="sticky right-0 z-10 border-l border-border-dark bg-[#131811] p-3 flex items-center justify-center shadow-[-4px_0_12px_rgba(0,0,0,0.5)]">
-                                        <span className="text-2xl font-bold text-primary">{answer.points_earned}</span>
                                     </td>
                                 </tr>
-                            ))
+                            ) : answers.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} className="p-12 text-center">
+                                        <p className="text-gray-400">No answers submitted yet</p>
+                                    </td>
+                                </tr>
+                            ) : (
+                                answers.map((answer) => (
+                                    <tr key={answer.id} className="bg-[#131811] border-b border-border-dark">
+                                        <td className="sticky left-0 z-10 p-4 flex items-center gap-3 shadow-[4px_0_12px_rgba(0,0,0,0.5)]">
+                                            <div className="flex flex-col">
+                                                <span className="text-white font-bold text-sm">{answer.player_name}</span>
+                                                {playerId === answer.player_id && <span className="text-xs text-primary bg-primary/10 px-1.5 py-0.5 rounded w-fit mt-1">You</span>}
+                                            </div>
+                                        </td>
+                                        <td className="p-3">
+                                            <div className="w-full h-full bg-[#1e271c] border border-primary/40 rounded-lg p-3 flex items-center justify-between group relative overflow-hidden">
+                                                <div className="absolute inset-0 bg-primary/5 pointer-events-none"></div>
+                                                <span className="text-white font-medium pl-1 text-base">{answer.name}</span>
+                                                <div className="flex gap-1 z-10">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => markAsValid(answer.id, "name", true)}
+                                                        className={`size-6 rounded flex items-center justify-center transition
+    ${answer.name_valid
+                                                                ? "bg-primary text-black"
+                                                                : "bg-[#2c3928] text-text-secondary hover:bg-primary hover:text-black"
+                                                            }`}
+                                                    >
+                                                        <Check size={14} />
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => markAsValid(answer.id, "name", false)}
+                                                        className={`size-6 rounded flex items-center justify-center transition
+    ${answer.name_valid === false
+                                                                ? "bg-danger text-white"
+                                                                : "bg-[#2c3928] text-text-secondary hover:bg-danger hover:text-white"
+                                                            }`}
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="p-3">
+                                            <div className="w-full h-full bg-[#1e271c] border border-primary/40 rounded-lg p-3 flex items-center justify-between group relative overflow-hidden">
+                                                <div className="absolute inset-0 bg-primary/5 pointer-events-none"></div>
+                                                <span className="text-white font-medium pl-1 text-base">{answer.animal}</span>
+                                                <div className="flex gap-1 z-10">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => markAsValid(answer.id, "animal", true)}
+                                                        className={`size-6 rounded flex items-center justify-center transition
+    ${answer.animal_valid
+                                                                ? "bg-primary text-black"
+                                                                : "bg-[#2c3928] text-text-secondary hover:bg-primary hover:text-black"
+                                                            }`}
+                                                    >
+                                                        <Check size={14} />
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => markAsValid(answer.id, "animal", false)}
+                                                        className={`size-6 rounded flex items-center justify-center transition
+    ${answer.animal_valid === false
+                                                                ? "bg-danger text-white"
+                                                                : "bg-[#2c3928] text-text-secondary hover:bg-danger hover:text-white"
+                                                            }`}
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="p-3">
+                                            <div className="w-full h-full bg-[#1e271c] border border-primary/40 rounded-lg p-3 flex items-center justify-between group relative overflow-hidden">
+                                                <div className="absolute inset-0 bg-primary/5 pointer-events-none"></div>
+                                                <span className="text-white font-medium pl-1 text-base">{answer.place}</span>
+                                                <div className="flex gap-1 z-10">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => markAsValid(answer.id, "place", true)}
+                                                        className={`size-6 rounded flex items-center justify-center transition
+    ${answer.place_valid
+                                                                ? "bg-primary text-black"
+                                                                : "bg-[#2c3928] text-text-secondary hover:bg-primary hover:text-black"
+                                                            }`}
+                                                    >
+                                                        <Check size={14} />
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => markAsValid(answer.id, "place", false)}
+                                                        className={`size-6 rounded flex items-center justify-center transition
+    ${answer.place_valid === false
+                                                                ? "bg-danger text-white"
+                                                                : "bg-[#2c3928] text-text-secondary hover:bg-danger hover:text-white"
+                                                            }`}
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="p-3">
+                                            <div className="w-full h-full bg-[#1e271c] border border-primary/40 rounded-lg p-3 flex items-center justify-between group relative overflow-hidden">
+                                                <div className="absolute inset-0 bg-primary/5 pointer-events-none"></div>
+                                                <span className="text-white font-medium pl-1 text-base">{answer.thing}</span>
+                                                <div className="flex gap-1 z-10">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => markAsValid(answer.id, "thing", true)}
+                                                        className={`size-6 rounded flex items-center justify-center transition
+    ${answer.thing_valid
+                                                                ? "bg-primary text-black"
+                                                                : "bg-[#2c3928] text-text-secondary hover:bg-primary hover:text-black"
+                                                            }`}
+                                                    >
+                                                        <Check size={14} />
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => markAsValid(answer.id, "thing", false)}
+                                                        className={`size-6 rounded flex items-center justify-center transition
+    ${answer.thing_valid === false
+                                                                ? "bg-danger text-white"
+                                                                : "bg-[#2c3928] text-text-secondary hover:bg-danger hover:text-white"
+                                                            }`}
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="sticky right-0 z-10 border-l border-border-dark bg-[#131811] p-3 flex items-center justify-center shadow-[-4px_0_12px_rgba(0,0,0,0.5)]">
+                                            <span className="text-2xl font-bold text-primary">{answer.points_earned}</span>
+                                        </td>
+                                    </tr>
+                                ))
+                            )
                         }
+
                     </tbody>
                 </table>
             </div>

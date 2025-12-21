@@ -55,7 +55,7 @@ export default function ChooseLetter({ onRoundStarted, roomId, roundNumber }: Ch
                     className="text-primary">Letter</span>
             </h2>
             <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-                <div className="pt-2 flex flex-col gap-4">
+                <div className="pt-2 flex flex-col items-center justify-center gap-4">
                     <Input
                         type="text"
                         placeholder="Enter a letter (A-Z)"
@@ -64,7 +64,7 @@ export default function ChooseLetter({ onRoundStarted, roomId, roundNumber }: Ch
                         onChange={handleLetterChange}
                         disabled={isPending}
                         maxLength={1}
-                        className="text-center text-2xl font-bold uppercase"
+                        className="text-center size-10 text-2xl font-bold uppercase"
                         autoFocus
                     />
                     {error && (
