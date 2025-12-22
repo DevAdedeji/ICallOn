@@ -58,7 +58,6 @@ export default function ChooseLetter({ onRoundStarted, roomId, roundNumber }: Ch
                 <div className="pt-2 flex flex-col items-center justify-center gap-4">
                     <Input
                         type="text"
-                        placeholder="Enter a letter (A-Z)"
                         required
                         value={letter}
                         onChange={handleLetterChange}
