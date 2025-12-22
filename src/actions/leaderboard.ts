@@ -2,7 +2,7 @@
 
 import { db } from "@/src/db";
 import { answers, players, rounds } from "@/src/db/schema";
-import { eq, and, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 export interface PlayerScore {
     playerId: string
