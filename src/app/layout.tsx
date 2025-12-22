@@ -13,6 +13,31 @@ const manrope = Poppins({
 export const metadata: Metadata = {
   title: "ICallOn",
   description: "Animal, Place or Things Game",
+  openGraph: {
+    title: "ICallOn — Race Against Time, Beat Your Friends",
+    description:
+      "Your popular Animal, Place or Things Word Game",
+    url: "https://i-call-on.vercel.app",
+    siteName: "ICallOn",
+    images: [
+      {
+        url: "https://i-call-on.vercel.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "ICallOn — Race Against Time, Beat Your Friends",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ICallOn — Race Against Time, Beat Your Friends",
+    description:
+      "Your popular Animal, Place or Things Word Game",
+    images: ["https://i-call-on.vercel.app/og-image.png"],
+    creator: "@devadedeji",
+  },
   icons: {
     icon: "/favicon.ico",
   },
