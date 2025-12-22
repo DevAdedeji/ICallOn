@@ -91,7 +91,7 @@ export default function CreateGamePage() {
                         <p className="text-white/60 text-sm font-medium leading-relaxed">Customize your word battle settings and get the squad ready for action.</p>
                     </div>
                 </div>
-                <div className="flex-1 p-6 md:p-10 flex flex-col bg-background-light/5 dark:bg-background-dark/40">
+                <div className="flex-1 p-6 md:p-10 flex flex-col bg-background-dark/40">
                     <div className="md:hidden mb-8">
                         <div className="flex items-center gap-3 mb-2">
                             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-lg text-background-dark text-sm font-bold">
