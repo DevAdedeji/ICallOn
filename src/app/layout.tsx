@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     siteName: "ICallOn",
     images: [
       {
-        url: "https://i-call-on.vercel.app/og-image.png",
+        url: "https://i-call-on.vercel.app/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "ICallOn — Race Against Time, Beat Your Friends",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     title: "ICallOn — Race Against Time, Beat Your Friends",
     description:
       "Your popular Animal, Place or Things Word Game",
-    images: ["https://i-call-on.vercel.app/og-image.png"],
+    images: ["https://i-call-on.vercel.app/og-image.jpg"],
     creator: "@devadedeji",
   },
   icons: {
