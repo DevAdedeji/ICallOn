@@ -1,14 +1,15 @@
 "use client"
 
-import { Room, User, Player } from "@/src/db/schema";
+import { Room, Player } from "@/src/db/schema";
 import type { User as LoggedInUser } from "@supabase/supabase-js";
 import { useEffect, useState } from "react"
 import { toast } from "sonner";
 import { supabase } from "@/src/lib/supabase/client";
 import GameScreen from "./GameScreen";
 import LobbyScreen from "./LobbyScreen";
+import Leaderboard from "./Leaderboard";
 
-export const GameContainer = ({ host, room: initialRoom, user, player }: { host?: User, room: Room, user?: LoggedInUser, player?: Player }) => {
+export const GameContainer = ({ room: initialRoom, user, player }: { room: Room, user?: LoggedInUser, player?: Player }) => {
 
     const roomId = initialRoom.id
     const [room, setRoom] = useState<Room>(initialRoom)
@@ -129,7 +130,6 @@ export const GameContainer = ({ host, room: initialRoom, user, player }: { host?
         case "lobby":
             return (
                 <LobbyScreen
-                    host={host}
                     room={initialRoom as Room}
                     user={user ?? undefined}
                     player={player}
@@ -140,7 +140,6 @@ export const GameContainer = ({ host, room: initialRoom, user, player }: { host?
         case "playing":
             return (
                 <GameScreen
-                    host={host}
                     room={initialRoom as Room}
                     user={user as LoggedInUser}
                     player={player as Player}
@@ -149,12 +148,8 @@ export const GameContainer = ({ host, room: initialRoom, user, player }: { host?
             )
         case "ended":
             return (
-                <main className="flex items-center justify-center h-screen">
-                    <div className="glass-panel rounded-2xl p-8 text-center">
-                        <h1 className="text-2xl font-bold text-yellow-500 mb-2">Game Ended</h1>
-                        <p className="text-gray-400">This game has already finished</p>
-                    </div>
-                </main>
+                <Leaderboard room={room}
+                    player={player} />
             )
         default:
             return (

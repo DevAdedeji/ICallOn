@@ -46,7 +46,7 @@ export default function JoinForm({ roomId }: { roomId: string }) {
     }
 
     return (
-        <div className="w-full max-w-110 glass-panel rounded-2xl p-8 md:p-10 animate-float flex flex-col gap-4">
+        <div className="w-full max-w-110 glass-panel rounded-2xl px-4 py-8 md:p-10 animate-float flex flex-col gap-4">
             <h2 className="text-2xl text-center font-extrabold tracking-tight text-white">
                 Ready to <span className="text-primary">Play?</span>
             </h2>

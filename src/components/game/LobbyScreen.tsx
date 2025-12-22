@@ -1,6 +1,6 @@
 "use client"
 
-import { Room, User, Player } from "@/src/db/schema";
+import { Room, Player } from "@/src/db/schema";
 import type { User as LoggedInUser } from "@supabase/supabase-js";
 import { useEffect, useState } from "react"
 import { Copy, Timer, RotateCw, Settings, Users, Play, User as UserIcon } from "lucide-react";
@@ -11,12 +11,12 @@ import { supabase } from "@/src/lib/supabase/client";
 import { updateRoomStatus } from "@/src/actions/rooms";
 import { useRouter } from "next/navigation";
 
-export default function LobbyScreen({ host, room, user, player, players, isLoading }: { host?: User, room: Room, user?: LoggedInUser, player?: Player, players: Player[], isLoading: boolean }) {
+export default function LobbyScreen({ room, user, player, players, isLoading }: { room: Room, user?: LoggedInUser, player?: Player, players: Player[], isLoading: boolean }) {
 
     const playerId = player?.id
     const [isStarting, setIsStarting] = useState(false)
 
-    const shareLink = `/play/${room.id}`
+    const shareLink = `${window.location.origin}/play/${room.id}`
     const copyGameLink = async () => {
         const success = await copyToClipboard(shareLink)
         if (success) {
@@ -28,12 +28,8 @@ export default function LobbyScreen({ host, room, user, player, players, isLoadi
 
     const roomId = room.id
 
-
-
-
     const hostPlayer = players.find((player) => player.user_id === room.hostId)
     const isHost = hostPlayer?.user_id === room.hostId && user?.id === room.hostId && playerId === hostPlayer?.id
-    const showStartButton = isHost && players.length > 1
     const router = useRouter()
 
     useEffect(() => {
@@ -72,25 +68,16 @@ export default function LobbyScreen({ host, room, user, player, players, isLoadi
 
     return (
         <main className="relative z-10 flex flex-1 flex-col items-center justify-center p-4 w-full">
-            <div className="flex-1 flex flex-col items-center w-full px-4 sm:px-6 lg:px-10 py-8 max-w-360 mx-auto gap-8">
+            <div className="flex-1 flex flex-col items-center w-full sm:px-6 lg:px-10 py-8 max-w-360 mx-auto gap-8">
                 <div className="w-full flex flex-col md:flex-row items-center justify-between gap-6 glass-panel p-8 rounded-3xl neon-glow">
                     <div className="flex flex-col gap-2 text-center md:text-left">
                         <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-white">Lobby</h1>
                         <p className="text-gray-400 text-base md:text-lg font-medium max-w-md">The game is about to begin. Share the code with your friends!</p>
                     </div>
                     <div className="flex flex-col items-center gap-3">
-                        <div className="text-xs font-bold uppercase tracking-widest text-primary/80">Room Code</div>
-                        <div className="flex items-center gap-4">
-                            <div className="relative group cursor-pointer">
-                                <div className="absolute -inset-1 bg-linear-to-r from-primary to-green-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-200"></div>
-                                <div className="relative px-8 py-3 bg-[#1a2418] rounded-xl border border-primary/30 flex items-center justify-center">
-                                    <span className="text-5xl font-black text-white tracking-[0.2em] neon-text-shadow font-mono">{room.code}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <button className="flex items-center gap-2 text-sm font-bold text-gray-300 hover:text-primary transition-colors" onClick={copyGameLink}>
+                        <button className="flex items-center gap-2 text-sm font-bold text-primary/80 hover:text-primary transition-colors" onClick={copyGameLink}>
                             <Copy />
-                            Copy Invite Link
+                            Copy Game Invite Link
                         </button>
                     </div>
                 </div>
@@ -132,7 +119,7 @@ export default function LobbyScreen({ host, room, user, player, players, isLoadi
                         )}
                     </div>
                     {/* Game settings */}
-                    <div className="flex flex-col gap-4 flex-1 min-w-75">
+                    <div className="flex flex-col gap-4 flex-1 sm:min-w-75">
                         <div className="flex items-center justify-between px-2">
                             <h3 className="text-xl font-bold flex items-center gap-2">
                                 <Settings className="text-gray-400" />
@@ -162,12 +149,12 @@ export default function LobbyScreen({ host, room, user, player, players, isLoadi
                         </div>
                     </div>
                 </div>
-                {showStartButton && (
+                {isHost && (
                     <div className="w-full flex items-center justify-end">
                         <Button
                             variant="primary"
                             className="md:w-auto"
-                            disabled={players.length === 0 || isStarting}
+                            disabled={players.length < 2 || isStarting}
                             onClick={startGame}
                             loading={isStarting}
                         >

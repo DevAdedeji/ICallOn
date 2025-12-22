@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client"
-import { Gamepad2, RotateCw, Timer, Key, Copy, Link, ArrowRight, LoaderCircle } from "lucide-react";
+import { Gamepad2, RotateCw, Timer, Copy, Link, ArrowRight, LoaderCircle } from "lucide-react";
 import Button from "@/src/components/ui/Button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -63,16 +63,6 @@ export default function CreateGamePage() {
         }
     }
 
-    const copyRoomCode = async () => {
-        if (roomCode) {
-            const success = await copyToClipboard(roomCode)
-            if (success) {
-                toast.success("Room code copied!")
-            } else {
-                toast.error("Failed to copy code")
-            }
-        }
-    }
 
     const copyGameLink = async () => {
         if (shareLink) {
@@ -153,21 +143,21 @@ export default function CreateGamePage() {
                         {roomCode && <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <Key className="text-primary text-xl" />
-                                    <h3 className="text-white font-bold text-sm tracking-wide uppercase opacity-90">Room Code</h3>
+                                    <Link className="text-primary text-xl" />
+                                    <h3 className="text-white font-bold text-sm tracking-wide uppercase opacity-90">Room Link</h3>
                                 </div>
                             </div>
-                            <div className="relative group cursor-pointer w-full">
+                            <button type="button" className="relative group cursor-pointer w-full" onClick={copyGameLink}>
                                 <div className="absolute inset-0 bg-primary/20 blur-xl rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                 <div className="relative bg-[#0a1108]/80 border border-white/10 rounded-2xl p-5 flex flex-col items-center justify-center gap-2 hover:border-primary/50  group-active:scale-[0.99] transition-transform">
-                                    <div className="text-6xl font-black text-white tracking-[0.25em] pl-4 font-mono neon-text-shadow">{roomCode}</div>
-                                    <button type="button" className="text-[10px] text-primary/70 font-mono tracking-widest uppercase flex items-center gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity" onClick={copyRoomCode}>
+                                    <div className="text-sm truncate font-black text-white tracking-[0.25em] w-[90%] mx-auto font-mono neon-text-shadow">{shareLink}</div>
+                                    <div className="text-[10px] text-primary/70 font-mono tracking-widest uppercase flex items-center gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
                                         <Copy size={12} />
                                         Click code to copy
-                                    </button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="space-y-2">
+                            </button>
+                            {/* <div className="space-y-2">
                                 <div className="flex items-center gap-2 bg-black/20 border border-white/10 rounded-2xl p-1.5 pr-2 focus-within:border-primary/50 focus-within:bg-black/40 focus-within:shadow-[0_0_15px_rgba(70,236,19,0.1)] transition-all">
                                     <div className="h-10 w-10 flex items-center justify-center rounded-xl text-white/40 bg-white/5">
                                         <Link />
@@ -177,7 +167,7 @@ export default function CreateGamePage() {
                                         Copy Link
                                     </button>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>}
                         <div className="pt-2 mt-auto">
                             <button type="submit"

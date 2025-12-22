@@ -3,8 +3,6 @@ import { fetchRoomById } from "@/src/actions/rooms";
 import { fetchUserById } from "@/src/actions/users";
 import { fetchPlayerById } from "@/src/actions/players";
 import JoinForm from "@/src/components/game/JoinForm";
-import LobbyScreen from "@/src/components/game/LobbyScreen";
-import GameScreen from "@/src/components/game/GameScreen";
 import { cookies } from "next/headers";
 import JoinExecutor from "@/src/components/game/JoinExecutor";
 import { Player, Room } from "@/src/db/schema";
@@ -89,7 +87,7 @@ export default async function PlayGamePage({
 
 
     return (
-        <GameContainer host={hostResult.user}
+        <GameContainer
             room={room as Room}
             user={user as User}
             player={player as Player} />

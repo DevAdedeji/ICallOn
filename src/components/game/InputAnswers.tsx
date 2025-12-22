@@ -93,7 +93,7 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
                 toast.error("Failed to submit answers")
             }
         } catch (err) {
-            //
+            console.log(err)
         } finally {
             setIsLoading(false)
         }
@@ -181,7 +181,7 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
     }
 
     if (round.status === "submitted" || isSubmitted) {
-        return isHost ? <ReviewAnswers room={room} round={round} player={player} /> :
+        return isHost ? <ReviewAnswers round={round} player={player} /> :
             <div className="space-y-8">
                 <div className="glass-panel rounded-2xl p-8 text-center">
                     <div className="flex flex-col items-center gap-4">

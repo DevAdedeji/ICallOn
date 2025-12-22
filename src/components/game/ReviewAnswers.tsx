@@ -1,12 +1,12 @@
 "use client";
 import { Check, X, ArrowRight } from "lucide-react";
-import { Player, Room, Round, Answer } from "@/src/db/schema";
+import { Player, Round, Answer } from "@/src/db/schema";
 import { fetchRoundAnswers, confirmRoundAnswers } from "@/src/actions/answers";
 import { endRound } from "@/src/actions/rounds";
 import { useEffect, useState } from "react";
 import Button from "../ui/Button";
 
-export default function ReviewAnswers({ room, round, player }: { room: Room, round: Round, player?: Player }) {
+export default function ReviewAnswers({ round, player }: { round: Round, player?: Player }) {
 
     const playerId = player?.id
     const [answers, setAnswers] = useState<Answer[]>([])
@@ -98,14 +98,15 @@ export default function ReviewAnswers({ room, round, player }: { room: Room, rou
 
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 overflow-hidden">
             <div className="flex flex-wrap justify-between items-end gap-4">
                 <div className="flex flex-col gap-2">
                     <h1 className="text-white tracking-tight text-3xl md:text-4xl font-extrabold leading-tight">Review Answers</h1>
                     <p className="text-text-secondary text-base font-normal max-w-2xl">Validate player answers to finalize scoring. Click checkmarks to approve or crosses to reject. Use bulk actions for speed.</p>
                 </div>
             </div>
-            <div className="w-full overflow-x-auto rounded-xl border border-border-dark bg-surface-dark/50 shadow-2xl">
+            {/* Desktop view */}
+            <div className="hidden lg:block w-full overflow-x-auto rounded-xl border border-border-dark bg-surface-dark/50 shadow-2xl">
                 <table className="min-w-250 border-collapse">
                     <thead>
                         <tr>
@@ -335,6 +336,163 @@ export default function ReviewAnswers({ room, round, player }: { room: Room, rou
 
                     </tbody>
                 </table>
+            </div>
+            {/* Mobile view */}
+            <div className="lg:hidden space-y-4">
+                {isFetching ? (
+                    <div className="flex flex-col items-center justify-center gap-4 py-12">
+                        <svg className="animate-spin h-10 w-10 text-primary" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        <p className="text-gray-400 font-semibold">Loading answers...</p>
+                    </div>
+                ) : answers.length === 0 ? (
+                    <div className="glass-panel p-8 rounded-xl text-center">
+                        <p className="text-gray-400">No answers submitted yet</p>
+                    </div>
+                ) : (
+                    answers.map((answer) => (
+                        <div key={answer.id} className="glass-panel p-4 rounded-xl border border-primary/30 space-y-4">
+                            {/* Player Header */}
+                            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                                <div className="flex flex-col">
+                                    <span className="text-white font-bold text-lg">{answer.player_name}</span>
+                                    {playerId === answer.player_id && (
+                                        <span className="text-xs text-primary bg-primary/10 px-2 py-1 rounded w-fit mt-1">You</span>
+                                    )}
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-xs text-gray-500 uppercase tracking-wider">Score</p>
+                                    <p className="text-2xl font-bold text-primary">{answer.points_earned}</p>
+                                </div>
+                            </div>
+
+                            {/* Answers Grid */}
+                            <div className="space-y-3">
+                                {/* Name */}
+                                <div className="bg-[#1e271c] border border-primary/40 rounded-lg p-3">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-xs text-gray-400 uppercase font-bold">Name</span>
+                                        <div className="flex gap-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => markAsValid(answer.id, "name", true)}
+                                                className={`size-7 rounded flex items-center justify-center transition ${answer.name_valid
+                                                    ? "bg-primary text-black"
+                                                    : "bg-[#2c3928] text-text-secondary"
+                                                    }`}
+                                            >
+                                                <Check size={16} />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => markAsValid(answer.id, "name", false)}
+                                                className={`size-7 rounded flex items-center justify-center transition ${answer.name_valid === false
+                                                    ? "bg-danger text-white"
+                                                    : "bg-[#2c3928] text-text-secondary"
+                                                    }`}
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <span className="text-white font-medium text-base">{answer.name || "—"}</span>
+                                </div>
+
+                                {/* Animal */}
+                                <div className="bg-[#1e271c] border border-primary/40 rounded-lg p-3">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-xs text-gray-400 uppercase font-bold">Animal</span>
+                                        <div className="flex gap-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => markAsValid(answer.id, "animal", true)}
+                                                className={`size-7 rounded flex items-center justify-center transition ${answer.animal_valid
+                                                    ? "bg-primary text-black"
+                                                    : "bg-[#2c3928] text-text-secondary"
+                                                    }`}
+                                            >
+                                                <Check size={16} />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => markAsValid(answer.id, "animal", false)}
+                                                className={`size-7 rounded flex items-center justify-center transition ${answer.animal_valid === false
+                                                    ? "bg-danger text-white"
+                                                    : "bg-[#2c3928] text-text-secondary"
+                                                    }`}
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <span className="text-white font-medium text-base">{answer.animal || "—"}</span>
+                                </div>
+
+                                {/* Place */}
+                                <div className="bg-[#1e271c] border border-primary/40 rounded-lg p-3">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-xs text-gray-400 uppercase font-bold">Place</span>
+                                        <div className="flex gap-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => markAsValid(answer.id, "place", true)}
+                                                className={`size-7 rounded flex items-center justify-center transition ${answer.place_valid
+                                                    ? "bg-primary text-black"
+                                                    : "bg-[#2c3928] text-text-secondary"
+                                                    }`}
+                                            >
+                                                <Check size={16} />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => markAsValid(answer.id, "place", false)}
+                                                className={`size-7 rounded flex items-center justify-center transition ${answer.place_valid === false
+                                                    ? "bg-danger text-white"
+                                                    : "bg-[#2c3928] text-text-secondary"
+                                                    }`}
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <span className="text-white font-medium text-base">{answer.place || "—"}</span>
+                                </div>
+
+                                {/* Thing */}
+                                <div className="bg-[#1e271c] border border-primary/40 rounded-lg p-3">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-xs text-gray-400 uppercase font-bold">Thing</span>
+                                        <div className="flex gap-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => markAsValid(answer.id, "thing", true)}
+                                                className={`size-7 rounded flex items-center justify-center transition ${answer.thing_valid
+                                                    ? "bg-primary text-black"
+                                                    : "bg-[#2c3928] text-text-secondary"
+                                                    }`}
+                                            >
+                                                <Check size={16} />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => markAsValid(answer.id, "thing", false)}
+                                                className={`size-7 rounded flex items-center justify-center transition ${answer.thing_valid === false
+                                                    ? "bg-danger text-white"
+                                                    : "bg-[#2c3928] text-text-secondary"
+                                                    }`}
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <span className="text-white font-medium text-base">{answer.thing || "—"}</span>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
             <Button variant="primary" type="button" onClick={() => handleConfirm()} loading={loading} disabled={loading}>
                 Confirm Scoring

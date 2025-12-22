@@ -64,7 +64,7 @@ export default function ChooseLetter({ onRoundStarted, roomId, roundNumber }: Ch
                         onChange={handleLetterChange}
                         disabled={isPending}
                         maxLength={1}
-                        className="text-center size-10 text-2xl font-bold uppercase"
+                        className="text-center! size-12 text-2xl font-bold uppercase"
                         autoFocus
                     />
                     {error && (

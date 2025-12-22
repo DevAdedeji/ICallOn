@@ -1,5 +1,5 @@
 "use client"
-import { Player, Room, Round, User } from "@/src/db/schema";
+import { Player, Room, Round } from "@/src/db/schema";
 import type { User as LoggedInUser } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import ChooseLetter from "./ChooseLetter";
@@ -8,7 +8,7 @@ import { supabase } from "@/src/lib/supabase/client";
 import { fetchRoundById } from "@/src/actions/rounds";
 import { updateRoomStatus } from "@/src/actions/rooms";
 
-export default function GameScreen({ host, room, user, player, players }: { host?: User, room: Room, user?: LoggedInUser, player?: Player, players: Player[] }) {
+export default function GameScreen({ room, user, player }: { room: Room, user?: LoggedInUser, player?: Player, players: Player[] }) {
     const isHost = user?.id === room.hostId
     const roomId = room.id
     const [round, setRound] = useState<Partial<Round> | null>(null)
