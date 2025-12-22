@@ -78,7 +78,7 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
                 round.id,
                 timeTaken,
                 room.id,
-                debouncedAnswers,
+                answers,
                 player.display_name
             )
             if (result.success) {
@@ -98,7 +98,7 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
             setIsLoading(false)
         }
 
-    }, [hasSubmitted, playerId, round.id, room.id, debouncedAnswers, timeLeft, room.timePerRound, player?.display_name, isHost])
+    }, [hasSubmitted, playerId, round.id, room.id, answers, timeLeft, room.timePerRound, player?.display_name, isHost])
 
     useEffect(() => {
         setTimeLeft(getTimeLeft())

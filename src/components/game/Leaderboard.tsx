@@ -77,7 +77,7 @@ export default function Leaderboard({
                 <div className="text-center space-y-4">
                     <div className="flex items-center justify-center gap-3">
                         <Trophy className="text-primary" size={48} />
-                        <h1 className="text-5xl font-black text-white tracking-tight">Final Results</h1>
+                        <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">Final Results</h1>
                         <Trophy className="text-primary" size={48} />
                     </div>
                     <p className="text-gray-400 text-lg">Game Complete! Here&apos;s how everyone did.</p>
@@ -88,19 +88,19 @@ export default function Leaderboard({
                     {leaderboard.map((playerScore, index) => (
                         <div
                             key={playerScore.playerId}
-                            className={`glass-panel p-6 rounded-2xl border-2 transition-all ${getPositionColor(playerScore.position)} ${player?.id === playerScore.playerId ? 'ring-2 ring-primary' : ''
+                            className={`glass-panel p-3 sm:p-6 rounded-2xl border-2 transition-all ${getPositionColor(playerScore.position)} ${player?.id === playerScore.playerId ? 'ring-2 ring-primary' : ''
                                 }`}
                         >
                             <div className="flex items-center justify-between gap-4">
                                 {/* Position & Name */}
-                                <div className="flex items-center gap-4 flex-1">
-                                    <div className="flex items-center justify-center size-12">
+                                <div className="flex items-center gap-2 sm:gap-4 flex-1">
+                                    <div className="flex items-center justify-center size-10 sm:size-12">
                                         {getPositionIcon(playerScore.position)}
                                     </div>
 
                                     <div className="flex flex-col">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-2xl font-bold text-white">
+                                            <span className="text-xl sm:text-2xl font-bold text-white">
                                                 {playerScore.playerName}
                                             </span>
                                             {player?.id === playerScore.playerId && (
@@ -169,7 +169,7 @@ export default function Leaderboard({
                 {leaderboard.length > 0 && leaderboard[0] && (
                     <div className="glass-panel p-8 rounded-2xl text-center bg-linear-to-r from-primary/10 to-green-600/10 border-2 border-primary/30">
                         <h2 className="text-3xl font-black text-white mb-2">
-                            🎉 Congratulations {leaderboard[0].playerName}! 🎉
+                            🎉 Congratulations {leaderboard[0].playerName}!
                         </h2>
                         <p className="text-gray-400">
                             You won with {leaderboard[0].totalPoints} points!

@@ -153,7 +153,7 @@ export default function CreateGamePage() {
                                     <div className="text-sm truncate font-black text-white tracking-[0.25em] w-[90%] mx-auto font-mono neon-text-shadow">{shareLink}</div>
                                     <div className="text-[10px] text-primary/70 font-mono tracking-widest uppercase flex items-center gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
                                         <Copy size={12} />
-                                        Click code to copy
+                                        Click to copy link
                                     </div>
                                 </div>
                             </button>
