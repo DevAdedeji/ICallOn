@@ -1,12 +1,13 @@
 "use client";
 import { Check, X, ArrowRight } from "lucide-react";
 import { Player, Round, Answer } from "@/src/db/schema";
-import { fetchRoundAnswers, confirmRoundAnswers } from "@/src/actions/answers";
+import { fetchRoundAnswers, confirmRoundAnswers, updateAnswerValidation } from "@/src/actions/answers";
 import { endRound } from "@/src/actions/rounds";
 import { useEffect, useState } from "react";
 import Button from "../ui/Button";
+import { supabase } from "@/src/lib/supabase/client";
 
-export default function ReviewAnswers({ round, player }: { round: Round, player?: Player }) {
+export default function ReviewAnswers({ round, player, isHost = true }: { round: Round, player?: Player, isHost?: boolean }) {
 
     const playerId = player?.id
     const [answers, setAnswers] = useState<Answer[]>([])
@@ -33,6 +34,35 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
         loadAnswers()
     }, [round.id])
 
+    useEffect(() => {
+        if (!round.id) return
+
+        const channel = supabase
+            .channel(`round-${round.id}-validation`)
+            .on(
+                "postgres_changes",
+                {
+                    event: "UPDATE",
+                    schema: "public",
+                    table: "answers",
+                    filter: `round_id=eq.${round.id}`
+                },
+                (payload) => {
+                    const updatedAnswer = payload.new as Answer
+                    setAnswers(prev =>
+                        prev.map(answer =>
+                            answer.id === updatedAnswer.id ? updatedAnswer : answer
+                        )
+                    )
+                }
+            )
+            .subscribe()
+
+        return () => {
+            supabase.removeChannel(channel)
+        }
+    }, [round.id])
+
     const POINTS_PER_ANSWER = 10;
 
     const calculatePoints = (answer: Answer) => {
@@ -44,7 +74,7 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
         return points;
     };
 
-    const markAsValid = (
+    const markAsValid = async (
         answerId: string,
         category: "name" | "animal" | "place" | "thing",
         valid: boolean
@@ -52,7 +82,6 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
         setAnswers(prev =>
             prev.map(answer => {
                 if (answer.id !== answerId) return answer;
-
                 const updated = {
                     ...answer,
                     ...(category === "name" && { name_valid: valid }),
@@ -60,13 +89,18 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                     ...(category === "place" && { place_valid: valid }),
                     ...(category === "thing" && { thing_valid: valid }),
                 };
-
                 return {
                     ...updated,
                     points_earned: calculatePoints(updated),
                 };
             })
         );
+
+        try {
+            await updateAnswerValidation(answerId, category, valid)
+        } catch (error) {
+            console.error('Failed to update validation:', error)
+        }
     };
 
     const [loading, setLoading] = useState(false);
@@ -100,10 +134,17 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
     return (
         <div className="space-y-8 overflow-hidden">
             <div className="flex flex-wrap justify-between items-end gap-4">
-                <div className="flex flex-col gap-2">
+                {!isHost ? (
+                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 mb-4">
+                        <p className="text-yellow-500 text-sm font-semibold text-center">
+                            🔍 The host is reviewing answers. Watch the scores update in real-time!
+                        </p>
+                    </div>
+                ) : <div className="flex flex-col gap-2">
                     <h1 className="text-white tracking-tight text-3xl md:text-4xl font-extrabold leading-tight">Review Answers</h1>
                     <p className="text-text-secondary text-base font-normal max-w-2xl">Validate player answers to finalize scoring. Click checkmarks to approve or crosses to reject. Use bulk actions for speed.</p>
-                </div>
+                </div>}
+
             </div>
             {/* Desktop view */}
             <div className="hidden lg:block w-full overflow-x-auto rounded-xl border border-border-dark bg-surface-dark/50 shadow-2xl">
@@ -206,6 +247,7 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                                                     <button
                                                         type="button"
                                                         onClick={() => markAsValid(answer.id, "name", true)}
+                                                        disabled={!isHost}
                                                         className={`size-6 rounded flex items-center justify-center transition
     ${answer.name_valid
                                                                 ? "bg-primary text-black"
@@ -218,6 +260,7 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                                                     <button
                                                         type="button"
                                                         onClick={() => markAsValid(answer.id, "name", false)}
+                                                        disabled={!isHost}
                                                         className={`size-6 rounded flex items-center justify-center transition
     ${answer.name_valid === false
                                                                 ? "bg-danger text-white"
@@ -238,6 +281,7 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                                                     <button
                                                         type="button"
                                                         onClick={() => markAsValid(answer.id, "animal", true)}
+                                                        disabled={!isHost}
                                                         className={`size-6 rounded flex items-center justify-center transition
     ${answer.animal_valid
                                                                 ? "bg-primary text-black"
@@ -250,6 +294,7 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                                                     <button
                                                         type="button"
                                                         onClick={() => markAsValid(answer.id, "animal", false)}
+                                                        disabled={!isHost}
                                                         className={`size-6 rounded flex items-center justify-center transition
     ${answer.animal_valid === false
                                                                 ? "bg-danger text-white"
@@ -270,6 +315,7 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                                                     <button
                                                         type="button"
                                                         onClick={() => markAsValid(answer.id, "place", true)}
+                                                        disabled={!isHost}
                                                         className={`size-6 rounded flex items-center justify-center transition
     ${answer.place_valid
                                                                 ? "bg-primary text-black"
@@ -282,6 +328,7 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                                                     <button
                                                         type="button"
                                                         onClick={() => markAsValid(answer.id, "place", false)}
+                                                        disabled={!isHost}
                                                         className={`size-6 rounded flex items-center justify-center transition
     ${answer.place_valid === false
                                                                 ? "bg-danger text-white"
@@ -302,6 +349,7 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                                                     <button
                                                         type="button"
                                                         onClick={() => markAsValid(answer.id, "thing", true)}
+                                                        disabled={!isHost}
                                                         className={`size-6 rounded flex items-center justify-center transition
     ${answer.thing_valid
                                                                 ? "bg-primary text-black"
@@ -314,6 +362,7 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                                                     <button
                                                         type="button"
                                                         onClick={() => markAsValid(answer.id, "thing", false)}
+                                                        disabled={!isHost}
                                                         className={`size-6 rounded flex items-center justify-center transition
     ${answer.thing_valid === false
                                                                 ? "bg-danger text-white"
@@ -378,6 +427,7 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                                             <button
                                                 type="button"
                                                 onClick={() => markAsValid(answer.id, "name", true)}
+                                                disabled={!isHost}
                                                 className={`size-7 rounded flex items-center justify-center transition ${answer.name_valid
                                                     ? "bg-primary text-black"
                                                     : "bg-[#2c3928] text-text-secondary"
@@ -388,6 +438,7 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                                             <button
                                                 type="button"
                                                 onClick={() => markAsValid(answer.id, "name", false)}
+                                                disabled={!isHost}
                                                 className={`size-7 rounded flex items-center justify-center transition ${answer.name_valid === false
                                                     ? "bg-danger text-white"
                                                     : "bg-[#2c3928] text-text-secondary"
@@ -408,6 +459,7 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                                             <button
                                                 type="button"
                                                 onClick={() => markAsValid(answer.id, "animal", true)}
+                                                disabled={!isHost}
                                                 className={`size-7 rounded flex items-center justify-center transition ${answer.animal_valid
                                                     ? "bg-primary text-black"
                                                     : "bg-[#2c3928] text-text-secondary"
@@ -418,6 +470,7 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                                             <button
                                                 type="button"
                                                 onClick={() => markAsValid(answer.id, "animal", false)}
+                                                disabled={!isHost}
                                                 className={`size-7 rounded flex items-center justify-center transition ${answer.animal_valid === false
                                                     ? "bg-danger text-white"
                                                     : "bg-[#2c3928] text-text-secondary"
@@ -438,6 +491,7 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                                             <button
                                                 type="button"
                                                 onClick={() => markAsValid(answer.id, "place", true)}
+                                                disabled={!isHost}
                                                 className={`size-7 rounded flex items-center justify-center transition ${answer.place_valid
                                                     ? "bg-primary text-black"
                                                     : "bg-[#2c3928] text-text-secondary"
@@ -448,6 +502,7 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                                             <button
                                                 type="button"
                                                 onClick={() => markAsValid(answer.id, "place", false)}
+                                                disabled={!isHost}
                                                 className={`size-7 rounded flex items-center justify-center transition ${answer.place_valid === false
                                                     ? "bg-danger text-white"
                                                     : "bg-[#2c3928] text-text-secondary"
@@ -468,6 +523,7 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                                             <button
                                                 type="button"
                                                 onClick={() => markAsValid(answer.id, "thing", true)}
+                                                disabled={!isHost}
                                                 className={`size-7 rounded flex items-center justify-center transition ${answer.thing_valid
                                                     ? "bg-primary text-black"
                                                     : "bg-[#2c3928] text-text-secondary"
@@ -478,6 +534,7 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                                             <button
                                                 type="button"
                                                 onClick={() => markAsValid(answer.id, "thing", false)}
+                                                disabled={!isHost}
                                                 className={`size-7 rounded flex items-center justify-center transition ${answer.thing_valid === false
                                                     ? "bg-danger text-white"
                                                     : "bg-[#2c3928] text-text-secondary"
@@ -494,10 +551,10 @@ export default function ReviewAnswers({ round, player }: { round: Round, player?
                     ))
                 )}
             </div>
-            <Button variant="primary" type="button" onClick={() => handleConfirm()} loading={loading} disabled={loading}>
+            {isHost && <Button variant="primary" type="button" onClick={() => handleConfirm()} loading={loading} disabled={loading}>
                 Confirm Scoring
                 <ArrowRight />
-            </Button>
+            </Button>}
         </div>
     )
 }

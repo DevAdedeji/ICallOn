@@ -107,7 +107,11 @@ export default function GameScreen({ room, user, player }: { room: Room, user?: 
                 isHost && round?.status == "pending" && (<ChooseLetter onRoundStarted={(updatedRound) => setRound(updatedRound)} roomId={roomId} roundNumber={currentRound} />)
             }
             {
-                !isHost && round?.status === "pending" && (<p>Please wait while the host selects a letter</p>)
+                !isHost && round?.status === "pending" && (<div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 mb-4">
+                    <p className="text-yellow-500 text-sm font-semibold text-center">
+                        🔍 Please wait while the host selects a letter!
+                    </p>
+                </div>)
             }
             {
                 round?.id && (round?.status === "active" || round?.status === "submitted") && (<InputAnswers room={room as Room} round={round as Round} player={player as Player} isHost={isHost} />)

@@ -217,3 +217,54 @@ export async function confirmRoundAnswers(
         };
     }
 }
+
+export async function updateAnswerValidation(
+    answerId: string,
+    category: "name" | "animal" | "place" | "thing",
+    valid: boolean
+) {
+    try {
+        const updateData = {
+            [`${category}_valid`]: valid,
+            updated_at: new Date(),
+            points_earned: 0,
+        }
+
+        // Also recalculate points
+        const answer = await db.query.answers.findFirst({
+            where: eq(answers.id, answerId)
+        })
+
+        if (answer) {
+            const POINTS_PER_ANSWER = 10
+            let points = 0
+            if (category === "name") points = valid ? POINTS_PER_ANSWER : 0
+            else if (answer.name_valid) points += POINTS_PER_ANSWER
+
+            if (category === "animal") points += valid ? POINTS_PER_ANSWER : 0
+            else if (answer.animal_valid) points += POINTS_PER_ANSWER
+
+            if (category === "place") points += valid ? POINTS_PER_ANSWER : 0
+            else if (answer.place_valid) points += POINTS_PER_ANSWER
+
+            if (category === "thing") points += valid ? POINTS_PER_ANSWER : 0
+            else if (answer.thing_valid) points += POINTS_PER_ANSWER
+
+            updateData.points_earned = points
+        }
+
+        const [result] = await db
+            .update(answers)
+            .set(updateData)
+            .where(eq(answers.id, answerId))
+            .returning()
+
+        return { success: true, answer: result }
+    } catch (error) {
+        console.error("Update answer validation error:", error)
+        return {
+            success: false,
+            error: "Failed to update validation"
+        }
+    }
+}
