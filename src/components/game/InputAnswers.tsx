@@ -13,6 +13,7 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
 
     const playerId = player?.id
     const [isSubmitted, setIsSubmitted] = useState(false)
+    const [answers, setAnswers] = useState({ name: '', animal: '', place: '', thing: '' })
 
     useEffect(() => {
         const loadAnswers = async () => {
@@ -24,7 +25,7 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
                     name: result.answers.name ?? '',
                     animal: result.answers.animal ?? '',
                     place: result.answers.place ?? '',
-                    things: result.answers.thing ?? '',
+                    thing: result.answers.thing ?? '',
                 })
                 if (result.answers.submitted_at) {
                     setIsSubmitted(true)
@@ -35,7 +36,6 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
         loadAnswers()
     }, [playerId, round.id, room.id])
 
-    const [answers, setAnswers] = useState({ name: '', animal: '', place: '', things: '' })
     const debouncedAnswers = useDebounce(answers, 1000)
 
     useEffect(() => {
@@ -60,7 +60,10 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
         const startTime = new Date(round.startedAt).getTime()
         const now = Date.now()
         const elapsedSeconds = Math.floor((now - startTime) / 1000)
-        return Math.max(0, room.timePerRound - elapsedSeconds)
+        const remaining = room.timePerRound - elapsedSeconds
+
+        // Ensure it never goes above the max time
+        return Math.min(Math.max(0, remaining), room.timePerRound)
     }, [round.startedAt, room.timePerRound])
 
     const [timeLeft, setTimeLeft] = useState(getTimeLeft)
@@ -102,9 +105,7 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
 
     useEffect(() => {
         setTimeLeft(getTimeLeft())
-    }, [round.startedAt, getTimeLeft])
 
-    useEffect(() => {
         if (isSubmitted) return
 
         const interval = setInterval(() => {
@@ -115,7 +116,7 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
         }, 1000)
 
         return () => clearInterval(interval)
-    }, [isSubmitted])
+    }, [isSubmitted, round.startedAt, getTimeLeft])
 
     const isUrgent = timeLeft <= 10
     const isCritical = timeLeft <= 5
@@ -170,8 +171,8 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
                         <Input placeholder="Place" value={answers.place}
                             onChange={(e) => setAnswers(prev => ({ ...prev, place: e.target.value }))}
                             disabled={loading} />
-                        <Input placeholder="Things" value={answers.things}
-                            onChange={(e) => setAnswers(prev => ({ ...prev, things: e.target.value }))}
+                        <Input placeholder="Things" value={answers.thing}
+                            onChange={(e) => setAnswers(prev => ({ ...prev, thing: e.target.value }))}
                             disabled={loading} />
                     </div>
                     <Button type="submit" variant="primary" loading={loading} disabled={loading}>SUBMIT</Button>

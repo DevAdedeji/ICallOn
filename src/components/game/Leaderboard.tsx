@@ -171,9 +171,11 @@ export default function Leaderboard({
                         <h2 className="text-3xl font-black text-white mb-2">
                             🎉 Congratulations {leaderboard[0].playerName}!
                         </h2>
-                        <p className="text-gray-400">
+                        {player?.id === leaderboard[0].playerId ? <p className="text-gray-400">
                             You won with {leaderboard[0].totalPoints} points!
-                        </p>
+                        </p> : <p className="text-gray-400">
+                            {leaderboard[0].playerName} won with {leaderboard[0].totalPoints} points!
+                        </p>}
                     </div>
                 )}
                 <div className="flex justify-center gap-4">
