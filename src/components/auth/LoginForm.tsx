@@ -8,9 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginFormInputs, loginSchema } from "@/src/schemas/auth";
 import { supabase } from "@/src/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from 'sonner';
-import posthog from "posthog-js";
 
 export default function LoginForm() {
     const { handleSubmit, register, formState: { errors } } = useForm<LoginFormInputs>({
@@ -37,17 +36,13 @@ export default function LoginForm() {
         await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {
-                redirectTo: `${location.origin}/auth/callback`,
+                redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
                 queryParams: {
                     prompt: "select_account"
                 }
             }
         })
     }
-
-    // useEffect(() => {
-    //     posthog.capture('SIGN_UP', { property: 'value' })
-    // }, [])
 
     return (
         <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
