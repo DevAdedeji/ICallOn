@@ -11,6 +11,9 @@ export async function proxy(request: NextRequest) {
     if (!session && request.nextUrl.pathname.startsWith("/create")) {
         return NextResponse.redirect(new URL("/auth/login", request.url));
     }
+    if (session && request.nextUrl.pathname.startsWith("/auth")) {
+        return NextResponse.redirect(new URL("/create", request.url));
+    }
 
     return supabaseResponse;
 }
