@@ -143,6 +143,12 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
         return (
             <div className="space-y-8">
 
+                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 mb-4">
+                    <p className="text-yellow-500 text-sm font-semibold text-center">
+                        {round.round_number}/{room.maxRounds}
+                    </p>
+                </div>
+
                 <div className="flex flex-col items-center justify-center">
                     <h1>Current Letter</h1>
                     <p className="capitalize font-bold text-9xl">{round.letter}</p>
@@ -181,7 +187,27 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
         )
     }
 
-    if (round.status === "submitted" || isSubmitted) {
+    if (isSubmitted && !isHost) {
+        return (
+            <div className="space-y-8">
+                <div className="glass-panel rounded-2xl p-8 text-center">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="size-16 rounded-full bg-primary/20 flex items-center justify-center">
+                            <svg className="size-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-bold text-white mb-2">Answers Submitted!</h2>
+                            <p className="text-gray-400">Waiting for host!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    if (round.status === "submitted") {
         return <ReviewAnswers round={round} player={player} isHost={isHost} />
     }
 
