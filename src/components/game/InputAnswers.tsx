@@ -187,6 +187,10 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
         )
     }
 
+    if (round.status === "submitted") {
+        return <ReviewAnswers round={round} player={player} isHost={isHost} />
+    }
+
     if (isSubmitted && !isHost) {
         return (
             <div className="space-y-8">
@@ -205,10 +209,6 @@ export default function InputAnswers({ room, round, player, isHost }: { room: Ro
                 </div>
             </div>
         )
-    }
-
-    if (round.status === "submitted") {
-        return <ReviewAnswers round={round} player={player} isHost={isHost} />
     }
 
     if (round.status === "ended") {
