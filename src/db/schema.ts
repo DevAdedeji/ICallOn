@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, integer, boolean, unique } from "drizzle-orm/pg-core";
 import { InferSelectModel } from "drizzle-orm";
 
 export const users = pgTable("users", {
@@ -32,7 +32,9 @@ export const players = pgTable("players", {
     totalScore: integer("total_score").notNull().default(0),
     isConnected: boolean("is_connected").notNull().default(true),
     joinedAt: timestamp("joined_at").defaultNow().notNull()
-})
+}, (t) => [
+    unique("unique_player_per_room").on(t.room_id, t.user_id)
+])
 
 export const rounds = pgTable("rounds", {
     id: text("id").primaryKey(),
