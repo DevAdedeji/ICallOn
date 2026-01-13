@@ -27,7 +27,20 @@ Players race against the clock to provide answers for four categories (Name, Ani
 - **Styling**: Tailwind CSS
 - **UI Components**: Custom components with Lucide icons
 
-## 📦 Installation
+## 📦 Installation & Setup
+
+### 1. Supabase Setup
+1. Create a new project at [database.new](https://database.new)
+2. In the Project Settings -> API, copy your **Project URL** and **anon public key**.
+3. Go to the **SQL Editor** in the Supabase Dashboard.
+4. Copy the contents of `supabase_rls.sql` (found in the root of this repo) and run it to set up Row Level Security policies.
+5. In **Database** -> **Replication**, enable replication for the following tables to support Realtime:
+   - `rooms`
+   - `players`
+   - `rounds`
+   - `answers`
+
+### 2. Local Setup
 
 1. **Clone the repository**
    ```bash
@@ -47,6 +60,7 @@ Players race against the clock to provide answers for four categories (Name, Ani
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    DATABASE_URL=your_database_connection_string
    ```
+   > **Note**: Get the `DATABASE_URL` from Project Settings -> Database -> Connection String (Use the Transaction Pooler mode (port 6543) for best performance with Server Actions)
 
 4. **Run database migrations**
    ```bash
@@ -58,7 +72,7 @@ Players race against the clock to provide answers for four categories (Name, Ani
    npm run dev
    ```
 
-6. Open [http://localhost:3000](http://localhost:4040) in your browser
+6. Open [http://localhost:4040](http://localhost:4040) in your browser
 
 ## 🎮 How to Play
 
